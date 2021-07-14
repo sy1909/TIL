@@ -189,7 +189,7 @@ sprintf("당신의 점수는 %d 이고 당신의 학점은 %s" , score , grade)
 # 주민번호를 가지고 남자 여자를 구분한다면
 # substr() , stringr::str_sub
 
-user.ssn <- "730910-1XXXXXX"
+user.ssn <- "921514-1XXXXXX"
 class( substr(user.ssn , 8, 8) )
 gender <- substr(user.ssn , 8, 8)
 if(gender == '1' | gender == '3'){
@@ -249,8 +249,8 @@ user.name
 
 switch(user.name , 
        '섭섭해'=30 , 
-       '임정섭'=40 , 
-       '임섭순'=50)
+       'abc'=40 , 
+       'abc'=50)
 
 
 # 1+2....10

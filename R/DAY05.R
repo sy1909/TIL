@@ -5,7 +5,7 @@
 stu.kor  <- c(81, 95, 70)
 stu.eng  <- c(75, 88, 78)
 stu.mat  <- c(78, 99, 100)
-stu.name <- c('한태형' , '임정섭' , '강려명')
+stu.name <- c('abc' , 'cde' , 'efs')
 
 stu.df <- data.frame(stu.name , 
                      stu.kor ,
@@ -248,10 +248,10 @@ barplot(colMissPer)
 # 조작함수
 # cbind() , rbind() , 
 # merge() == join 
-tmp.df01 <- data.frame(name = c('임정섭', '임은결' , '임재원') , 
+tmp.df01 <- data.frame(name = c('abc', 'abc' , 'abc') , 
                        math = c(100, 60, 100))
 
-tmp.df02 <- data.frame(name = c('임재원', '임은결' , '임정섭') , 
+tmp.df02 <- data.frame(name = c('abc', 'abc' , 'abc') , 
                        eng  = c(95, 80, 100))
 
 tmp.df01

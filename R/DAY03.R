@@ -85,7 +85,7 @@ class(result)
 # vector 를 이용한 방법
 ?data.frame
 id     <- c(100 , 200 , 300)
-name   <- c("섭섭" , "김승윤" , "홍길동동")
+name   <- c("abc" , "abc" , "abc")
 salary <- c(1000000 , 2000000 , 3000000)
 
 exDF <- data.frame(id , name , salary)
@@ -93,7 +93,7 @@ exDF$id
 
 #matrix 를 이용한 방법
 matrix
-matDF <- matrix(data = c(1,"김승윤" , 150, 2,"rlatmddbs" , 50 , 3 , "rlatmd" , 150) 
+matDF <- matrix(data = c(1,"abc" , 150, 2,"abc" , 50 , 3 , "rlatmd" , 150) 
                 ,nrow = 3 ,
                 byrow = T)
 
