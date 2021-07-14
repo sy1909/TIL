@@ -1,52 +1,49 @@
 
 # 주석문 & 출력함수
 
-# print('섭섭이와 함께하는 즐겁않는 파이썬 수업~~')
-#
-# '''
-# 우리는 달려간다
-# 이상한 나라로 ~ 섭섭이가 잡혀있는 마왕의 소굴로
-# 어른들은 모르는
-# '''
 
-# print('''우리는 달려간다
-# 이상한 나라로 ~ 섭섭이가 잡혀있는 마왕의 소굴로
-# 어른들은 모르는''')
+# print('''아무말대잔치
+# 이상한 나라가나다라마바사아자차카타파하
+# 이상한소리''')
 
-# print() : sep , end
-# print('010' , '4603' , '2283' , sep='-')
-# print('P','Y','T','H','O','N' , sep='')
-# print('jslim9413' , 'naver.com' , sep='@')
-# print('Welcome To ', end=' ')
-# print("Seop's World")
+#print() : sep , end
+print('010' , '4603' , '2283' , sep='-')
+print('P','Y','T','H','O','N' , sep='')
+print('jslim9413' , 'naver.com' , sep='@')
+print('Welcome To ', end=' ')
+print("Seop's World")
 
-# format (d, s, f)
-# print('{} {}'.format('one' , 'two'))
-# print('{1} {0}'.format('one' , 'two'))
-# print('%s %d' % ('one' , '100'))
+#format (d, s, f)
+print('{} {}'.format('one' , 'two'))
+print('{1} {0}'.format('one' , 'two'))
+print('%s %d' % ('one' , '100'))
 
-# 자리수 지정
-# print('%10s' % 'seop')
-# print('%-10s' % 'seop')
-# print('%5s' % 'pythonGood')
-#
-# print('%d' % 100)
-# print('%1.3f' % 3.14159)
-#
-# print('{:>10}'.format('nice'))
-# print('{:_>10}'.format('nice'))
-# print('{:$>10}'.format('nice'))
-# print('{:10}'.format('nice'))
-# 중앙정렬
-# print('{:^10}'.format('nice'))
-# 절삭 .
-# print('%.5s' % 'pythonstudy')
-# print('{:10.5}'.format('pythonstudy'))
-# print('{:.5}'.format('pythonstudy'))
-# print('%4d' % 42)
-# print('{:4d}'.format(42))
+#자리수 지정
+print('%10s' % 'seop')
+print('%-10s' % 'seop')
+print('%5s' % 'pythonGood')
+
+print('%d' % 100)
+print('%1.3f' % 3.14159)
+
+print('{:>10}'.format('nice'))
+print('{:_>10}'.format('nice'))
+print('{:$>10}'.format('nice'))
+print('{:10}'.format('nice'))
+
+#중앙정렬
+print('{:^10}'.format('nice'))
+
+#절삭 .
+print('%.5s' % 'pythonstudy')
+print('{:10.5}'.format('pythonstudy'))
+print('{:.5}'.format('pythonstudy'))
+print('%4d' % 42)
+print('{:4d}'.format(42))
+
 
 # 변수 Variable
+
 '''
 Built-In Types
 - Numeric
@@ -56,14 +53,19 @@ Built-In Types
 - Mapping(dict , tuple)
 - Boolean
 - Class(Object Oriented Programming)
+
 변수 지정방법
 - Camel  Case -> function , method (ex numberOfCollege)
 - Pascal Case -> class (ex NumberOfCollege)
 - Snake  Case -> variable , method , function (ex number_of_college)
+
 주의사항
+
 변수는 숫자로 시작할 수 없다
 허용되는 특수문자 _ , $
 예약어는 변수명으로 사용이 불가
+
+
 '''
 # year  = 2021
 # month = 7
@@ -140,9 +142,11 @@ print(seqTxt[0:4])
 strSlicing = 'nice Python'
 print(strSlicing[0:4])
 print(strSlicing[5:])
-print(strSlicing[0:len(strSlicing):2])
+
+print(strSlicing[0:len(strSlicing):2]) #2칸씩 띄어서 출력 nc yhn
 print(strSlicing[-6:])
-print(strSlicing[::-1])
+
+print(strSlicing[::-1]) #역순으로 출력 nohtyP ecin
 
 # 홀만 출력한다면?
 # [start : end-1 : step]
@@ -150,7 +154,7 @@ exStr = '홀짝홀짝홀짝홀짝홀짝홀짝'
 print( type(exStr))
 print(exStr[::2])
 print(exStr[1::2])
-print('Capitalize : ' , strSlicing.capitalize())
+print('Capitalize : ' , strSlicing.capitalize()) #첫글자 대문자
 
 phone_number = "010-4603-2283"
 print(phone_number , phone_number.replace('-' , " "))
@@ -245,12 +249,21 @@ movie_rank = ['그루엘라' , '랑종' , '모가디슈' , '블랙위도우' , '
 '''
 
 
+movie = ['그루엘라' , '랑종' , '모가디슈' , '블랙위도우', '강철비2' , '반도' , '킹덤']
+
+movie.append('배드맨')
+print(movie)
+
+movie.insert(2,'임정섭')
+print(movie)
+
+movie.remove('블랙위도우')
+print(movie)
 
 
+movie.pop(movie.index('그루엘라'))
 
-
-
-
+print(movie)
 
 
 
