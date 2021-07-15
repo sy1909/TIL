@@ -289,7 +289,8 @@ print(word_cnt)
 
 # list : [] , tuple : () , set : {} , dict : {key , value}
 
-
+print(set(word_list))
+print([word_list.count(i) for i in set(word_list)])
 
 
 
