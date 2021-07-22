@@ -1,33 +1,97 @@
-# [실습]
-# 1. Account class 작성 : 인스턴스 변수 - account, balance, interestRate
-# 2. accountInfo() - 계좌의 정보를 출력한다(account, balance, interestRate)
-# 3. deposit(amount) - 계좌 잔액에 매개변수로 들어온 amount를 누적한다.
-# 4. printInterestRate() - 현재 잔액에 이자율을 계산하여 소수점 자리 2자리까지 출력한다.
-# 5. withDraw(amount) - 매개변수로 들어온 금액만큼을 출금하여 잔액을 변경한다.
-# 단) 잔고가 부족할 경우 '잔액이 부족하여 출금할 수 없습니다' 출력한다.
 
-class Account:
-    def __init__(self , account , balance , interestRate):
-        self.account = account
-        self.balance = balance
-        self.interestRate = interestRate
+# 학습목표 : 객체지향(oop)
+# class vs instance
+# 함수기반의 객체지향 - 클래스의 개념 또한 포함
+# 함수 < 클래스(변수, 함수) < 모듈(xxx.py) < package
+# 클래스 ?
+'''
+- 함수의 모음
+- 역할 : 여러개의 함수와 공유 자료(변수)를 묶어서 관리하는 템플릿
+- 구성 : 멤버 = 변수 + 함수(메서드) + 생성자
+'''
 
-    def accountInfo(self):
-        print(self.account , self.balance , self.interestRate)
+from bigdata.oop.oop_day05 import *
 
-    def deposit(self , amount):
-        self.balance += amount
+# 인스턴스 생성
+# instance = Person()
+# instance.변수
+# instance.함수()
 
-    def printInterestRate(self):
-        self.balance += (self.balance * self.interestRate)
-        #self.balance = self.balance * self.interestRate
-        print(round(self.balance , 2))
+# perName = '임임임'
+# perAge  = 27
+# perGender = 'M'
+#
+# def doing() :
+#     print('{} 는 나이가 {} 이며 성별은 {} 이고 일하고 있다'.format(perName, perAge, perGender))
+#
+# doing()
 
-    def withDraw(self , amount):
-        if amount > self.balance:
-            print('잔액이 부족하여 출금할 수 없습니다.')
-        else:
-            self.balance -= amount
+# perObj = Person('임임임' , 49 , 'M')
+# perObj.doing()
+# print(perObj.name)
+# print(perObj.age)
+# print(perObj.gender)
+#
+# perObj02 = Person('섭섭해' , 29 , 'F')
+# perObj02.doing()
+# print(perObj02.name)
+# print(perObj02.age)
+# print(perObj02.gender)
+
+# perList = []
+# perList.append(Person('임임임' , 49 , 'M'))
+# perList.append(Person('섭섭해' , 29 , 'F'))
+#
+# for obj in perList :
+#     # print(dir(obj))
+#     print(obj.perInfo())
+
+# obj01 = Person('임임임' , 49 , 'M')
+# obj01.printClsVar()
+# Person.cls_var = 4.5
+# obj01.printClsVar()
+# 클래스 이름으로 인스턴스 소유의 함수 접근 불가
+# Person.perInfo()
+# Person.classFunc()
+
+
+# empObj01 = Employee('jslim' , 1000 )
+# print( empObj01.getSalary() )
+#
+# empObj02 = Employee('조조조' , 1200 )
+# print( empObj02.getSalary() )
+#
+# # 급여 인상
+# empObj01.incrementSalary()
+# empObj02.incrementSalary()
+# print( empObj01.getSalary() )
+# print( empObj02.getSalary() )
+#
+# # 인상률 변경
+# Employee.changeRate(1.5)
+#
+# # 급여 인상
+# empObj01.incrementSalary()
+# empObj02.incrementSalary()
+# print( empObj01.getSalary() )
+# print( empObj02.getSalary() )
+
+# empObj01 = Employee('jslim' , 1000 )
+# print( empObj01.getSalary() )
+# empObj01.incrementSalary()
+# print( empObj01.getSalary() )
+# empObj01.instanceRate(1.5)
+# empObj01.incrementSalary()
+# print( empObj01.getSalary() )
+#
+# print('empObj02')
+# empObj02 = Employee('조조조' , 1200 )
+# print( empObj02.getSalary() )
+# empObj02.incrementSalary()
+# print( empObj02.getSalary() )
+
+myDreamCar = Car('티코' , 4 , 4000)
+myDreamCar.carInfo()
 
 # caller 쪽에서 객체생성후
 account = Account('441-2919-1234' , 500000, 0.073)
@@ -39,3 +103,19 @@ account.withDraw(600000)
 account.accountInfo()
 print("현재 잔액의 이자를 포함한 금액")
 account.printInterestRate()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
