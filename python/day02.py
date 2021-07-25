@@ -31,9 +31,11 @@ b = [10 , 3.14 , True , 'string' , a ]
 print('inner list - ' , b[-1][1:]  , type(b[-1][1:]))
 
 # range() : 숫자를 sequence
+
 tmpRange = range(1 , 11 , 2)
+print(type(tmpRange))
 print('range - ' , tmpRange , 10 in tmpRange)
-for idx in tmpRange :
+for idx in range(1 , 11 , 2) :
     print(idx , end='\t')
 
 print()
@@ -42,6 +44,9 @@ import random
 tmpList = []
 for idx in range(5) :
     tmpList.append(random.randint(1,5))
+
+for idx in range(5):
+    print(idx)
 
 print('tmpList - ' , tmpList)
 
@@ -263,10 +268,11 @@ word_list = ['love' , 'jslim' , 'cat' , 'cat' , 'jslim' , 'word' , 'love' , 'luc
 wc = {}
 for word in word_list :
     wc[word] = wc.get(word , 0) + 1
+    print(word , "의 value 는 증가중 " , wc[word])
 print('wc' , wc)
 
 # case 01
-dict(zip(set(word_list) , [word_list.count(i) for i in set(word_list)]))
+dict(zip( set(word_list) , [word_list.count(i) for i in set(word_list)]))
 
 # case 02
 word_set = list(set(word_list))

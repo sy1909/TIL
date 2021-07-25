@@ -13,18 +13,26 @@ print('jslim9413' , 'naver.com' , sep='@')
 print('Welcome To ', end=' ')
 print("Seop's World")
 
+for i in range(1,5):
+    print("dkjf" , end = "")
+
 #format (d, s, f)
 print('{} {}'.format('one' , 'two'))
+
+print('one ' + 'two')
+
 print('{1} {0}'.format('one' , 'two'))
-print('%s %d' % ('one' , '100'))
+print('%s %d' %('one' , 100))
 
 #자리수 지정
-print('%10s' % 'seop')
-print('%-10s' % 'seop')
-print('%5s' % 'pythonGood')
+print('%10s' %'seop')
+print('%-10s' %'seop')
+print('%5s' %'pythonGood')
 
-print('%d' % 100)
-print('%1.3f' % 3.14159)
+print('%d' %100)
+print('%1.3f' %3.14159)
+
+print(round(3.14159 , 3))
 
 print('{:>10}'.format('nice'))
 print('{:_>10}'.format('nice'))
@@ -36,6 +44,7 @@ print('{:^10}'.format('nice'))
 
 #절삭 .
 print('%.5s' % 'pythonstudy')
+print("d")
 print('{:10.5}'.format('pythonstudy'))
 print('{:.5}'.format('pythonstudy'))
 print('%4d' % 42)
@@ -90,25 +99,29 @@ numCnt = 100
 print( numStr + str(numCnt) )
 print( int(numStr) + numCnt )
 
-# list
-# list = ['jslim' , 'python' , numStr]
+#list
+#list = ['jslim' , 'python' , numStr]
 # print(list , type(list))
 # print(list[0])
 
 # dict(key , value)
-# dict = {
-#     "name"    : "machine Learning" ,
-#     "version" : 2.0
-# }
-# print(dict, type(dict))
+dict1 = {
+    "name"    : "machine Learning" ,
+    "version" : 2.0
+}
+print(dict1, type(dict))
+print(dict1["name"] , dict1["version"])
 
 # tuple()
 # tuple = (3,5,7)
 # print(tuple , type(tuple))
 
 # set {}
-# set = {3,5,7}
-# print(set , type(set))
+set1 = {3,5,7}
+print(set1 , type(set1))
+l = [2,2,2,5,5,6,7]
+print(set(l))
+print(type(set(l)))
 
 # input()
 # 키보드 입력시 사용하는 함수
@@ -117,12 +130,12 @@ print( int(numStr) + numCnt )
 # print(inputNum + 100)
 
 # 문자형(중요)
-str01 = "I am Python"
-str02 = 'I am Python'
-str03 = """this is a
-           multi line"""
-str03 = '''this is a
-           multi line'''
+#str01 = "I am Python"
+# str02 = 'I am Python'
+# str03 = """this is a
+#            multi line"""
+# str03 = '''this is a
+#            multi line'''
 
 query = '''
 select  *
@@ -130,6 +143,8 @@ from    emp
 where   deptno = {no}
 order by eno desc
 '''
+
+#list(map(int , input().split(' ') ))
 
 seqTxt = 'Talk is cheap. Show me the code'
 print(seqTxt , type(seqTxt) , len(seqTxt))
@@ -169,6 +184,8 @@ print(url[-3:] , url[url.find('com'):])
 print(url[len(url)-3 : ])
 
 url_list = url.split('.')
+lst = ['1','2','3','4','5']
+
 print(url_list , type(url_list) , url_list[-1])
 
 company_name = "   삼성전자   "
@@ -192,6 +209,8 @@ print('Apple'.lower() in dumyTxt)
 
 drinking = 'cocacola'
 print( len(drinking) , drinking.count('c') , drinking.find('l') , drinking.index('a'))
+
+
 
 x = '::'
 y = 'abcd'
