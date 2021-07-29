@@ -63,8 +63,23 @@ mpg %>%
   mutate(tot = (cty+hwy)/2) %>%        
   summarise(mean_tot = mean(tot)) %>% 
   arrange(desc(mean_tot)) %>%          
-  head(5)      
+  head(5)
 
+mpg.df %>%
+  mutate(sum = cty + hwy) %>%
+  filter(class == 'suv') %>%
+  group_by(manufacturer) %>%
+  summarise(sum_mean=mean(sum)) %>%
+  arrange(desc(sum_mean)) %>%
+  head(5)
+
+resultresult <- df %>%
+  mutate(avg_rate = (cty+hwy)/2) %>%
+  filter(class == "suv") %>%
+  group_by(manufacturer) %>%
+  summarise(mean_avg_rate = mean(avg_rate)) %>%
+  arrange(desc(mean_avg_rate)) %>%
+  head(5)
 
 # 6. mpg 데이터의 class는 "suv", "compact" 등 자동차의 특징에 따라 
 # 일곱 종류로 분류한 변수입니다. 어떤 차종의 도시 연비가 높은지 비교하려 합니다. 

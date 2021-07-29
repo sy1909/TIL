@@ -1,35 +1,40 @@
-import mpg as m
+#import mpg as m
 from statistics import mean
+import pandas as pd
+#import numpy as np
+#from IPython.display import display 
 
-mpgList = []
+file_path = 'C:\\Users\\ksy\\TIL\\python\\mpg.txt'
+lines = pd.read_csv(file_path , sep =',')
 
-with open('C:\\Users\\ksy\\TIL\\python\\mpg.txt' , 'r' , encoding = 'utf-8') as file:
-    lines = file.readline()
-    lines = file.readlines()
-#    print(lines[0])
-    for line in lines :
-        data = line.strip('\n').split(',')
-        #print(data)
-        instance = m.Mpg(data[0] , data[1] , data[2], data[3], data[4], data[5], data[6], data[7], data[8], data[9], data[10])
-        mpgList.append(instance)
+# print(type(lines))
+# print(lines.head())
+# print(lines.columns) # 컬럼들 (= 피처들)
 
+# print(lines.dtypes)  # 전체 컬럼들의 타입 
+# print()
+
+# print(lines["manufacturer"])
+# print(lines["manufacturer"].unique()) #중복제거
+# #lines[["displ" , "hwy"]] = lines[["displ" , "hwy"]].apply(pd.to_numeric)
+# print()
+# print(lines.dtypes)
+#print(lines.loc[0:3])
 
 # 1. displ(배기량)이 4 이하인 자동차와 5 이상인 자동차 중
 # 어떤 자동차의 hwy(고속도로 연비)가 평균적으로 더 높은지 확인하세요.
 
 def question01() :
     print("1번 문제")
-    displ04 = []
-    displ05 = []
-    for instance in mpgList:
-        if float(instance.getDispl()) <= 4:
-            displ04.append(int(instance.getHwy()))
-        if float(instance.getDispl()) >= 5:
-            displ05.append(int(instance.getHwy()))
+#    print(lines[ lines["displ"] <= 4 ]["hwy"])
+    displ04 = lines[ lines["displ"] <= 4 ]["hwy"].mean()
+    displ05 = lines[lines["displ"] >= 5]["hwy"].mean()
+    # print(lines[lines["displ"] <= 4]["hwy"].mean())
+    # print(lines[lines["displ"] >= 5]["hwy"].mean())
 
-    print('4 - ', mean(displ04))
-    print('5 - ', mean(displ05))
-    if mean(displ04) > mean(displ05) :
+    print('4 - ', displ04)
+    print('5 - ', displ05)
+    if displ04 > displ05:
         print('배기량 4의 연비가 더 높습니다.')
     else:
         print('배기량 5의 연비가 더 높습니다.')
@@ -43,49 +48,13 @@ question01()
 
 def question02():
     print("2번 문제")
-    mpg_1 = []
-    mpg_2 = []
-    for instance in mpgList:
-        if instance.getManufacturer() == 'audi':
-#            print("mpg1 실행" , instance.getManufacturer())
-            mpg_1.append(instance.getCty())
-        if instance.getManufacturer() == 'toyota':
-#            print("mpg2 실행" , instance.getManufacturer())
-            mpg_2.append(instance.getCty())
-    
-    mpg_1 = map(int, mpg_1)
-    mpg_2 = map(int, mpg_2)
-    m_mpg_1 = mean(mpg_1)
-    m_mpg_2 = mean(mpg_2)
-    print("  audi - " , m_mpg_1)
-    print("toyota - " , m_mpg_2)
+    mpg_1 = lines[ lines["manufacturer"] == 'audi' ]["cty"].mean()
+    mpg_2 = lines[lines["manufacturer"] == 'toyota']["cty"].mean()
 
-    if m_mpg_1 > m_mpg_2:
-        print('audi 가 연비가 더 높습니다.')
-    else:
-        print('toyota 가 연비가 더 높습니다.')
-    print()
+    print("  audi - " , mpg_1)
+    print("toyota - " , mpg_2)
 
-question02()
-
-def question02():
-    print("2번 문제")
-    mpg_1 = []
-    mpg_2 = []
-    for instance in mpgList:
-        if instance.getManufacturer() == 'audi':
-#            print("mpg1 실행" , instance.getManufacturer())
-            mpg_1.append(int(instance.getCty()))
-        if instance.getManufacturer() == 'toyota':
-#            print("mpg2 실행" , instance.getManufacturer())
-            mpg_2.append(int(instance.getCty()))
-
-    m_mpg_1 = mean(mpg_1)
-    m_mpg_2 = mean(mpg_2)
-    print("  audi - " , m_mpg_1)
-    print("toyota - " , m_mpg_2)
-
-    if m_mpg_1 > m_mpg_2:
+    if mpg_1 > mpg_2:
         print('audi 가 연비가 더 높습니다.')
     else:
         print('toyota 가 연비가 더 높습니다.')
@@ -99,13 +68,8 @@ question02()
 
 def question03():
     print("3번 문제")
-    mpg_1 = []
-    for instance in mpgList:
-        if instance.getManufacturer() in ["chevrolet", "ford", "honda"]:
-            mpg_1.append(instance.getHwy())
-    mpg_1 = map(int, mpg_1)
-    m_mpg_1 = mean(mpg_1)
-    print('chevrolet", "ford", "honda 의 연비 평균은 - ' , m_mpg_1)
+    mpg_1 = lines[ lines["manufacturer"].isin( ["chevrolet", "ford", "honda"] ) ]["hwy"].mean()
+    print('chevrolet", "ford", "honda 의 연비 평균은 - ' , mpg_1)
     print()
 
 question03()
@@ -116,16 +80,9 @@ question03()
 
 def question04():
     print("4번 문제")
-    mpg_1 = []
-    for instance in mpgList:
-        if instance.getManufacturer() == 'audi':
-#            print(instance.getHwy())
-            mpg_1.append([instance.getManufacturer() , instance.getModel() , instance.getDispl() , instance.getYear() , instance.getCty() , int(instance.getHwy()) ,instance.getFl()])
-            
-#    mpg_1 = sorted(mpg_1 , reverse = True)
-    mpg_1.sort(key = lambda x: (x[0] , -x[5]))
-    for i in mpg_1[0:5]:
-        print(i)
+#    print(lines[lines["manufacturer"] == 'audi'])  
+    mpg_1 = lines[ lines["manufacturer"] == 'audi'].sort_values(by=['hwy'] , ascending=False)[:5]
+    print(mpg_1)
     print()
 question04()
 
