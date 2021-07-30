@@ -153,7 +153,7 @@ def subway_st():
     cnt =0
     same_st = []
     for j in seoul_station: # 여기서 단어를 비교
-        for i in station:   # () 가 추가로 붙어있음
+        for i in station:  # () 가 추가로 붙어있음
             #print(j.find(i))
             if i.find(j) == 0 and i not in same_st:
                 if i==j:
@@ -169,6 +169,9 @@ def subway_st():
             elif i == "양평" and j == "양평(5)":
                 same_st.append(j)
 
+
+
+
     print(len(same_st))
     for i in same_st:
         print(i)
@@ -180,6 +183,13 @@ def subway_st():
 #    for i in seoul_station:
 #        print(i)
 
+
+    cnt =0
+    same_st = []
+    for j in seoul_station: # 여기서 단어를 비교
+        for i in station:  # () 가 추가로 붙어있음
+            if i.find(j) == 0 and i not in same_st:
+                same_st.append(i) 
 
 
 #corona()
