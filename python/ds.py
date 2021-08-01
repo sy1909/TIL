@@ -170,8 +170,8 @@ def subway_st():
                 same_st.append(j)
 
     print(len(same_st))
-    for i in same_st:
-        print(i)
+    # for i in same_st:
+    #     print(i)
 
     # for i in seoul_station:
     #     if i not in same_st:
@@ -180,12 +180,46 @@ def subway_st():
 #    for i in seoul_station:
 #        print(i)
 
+from glob import glob # 파일 경로를 조작할 수 있다.
+import chardet
+def subway_all_file():
+    # 해당 디렉토리 내에 .csv 파일을 다 불러와서 리스트에 담아준다.
+    file_path = glob('C:\\Users\\ksy\\downloads\\data\\*.csv')
+    all_file = []
+    #인코딩 확인 코드-----------------------------------------------
+    for path in file_path:
+        rawdata = open(path, 'rb').read() #파일 열고
+        result = chardet.detect(rawdata) # 인코딩 형식 검사하고
+        charenc = result['encoding']  # 인코딩 결과 확인하고
+        print(charenc)    
+    #인코딩 확인 코드 마무리 ----------------------------------------
+        # utf8 error -> engine='python' 으로 해결 (무시하는듯 한글깨짐) 
+        # 위에서 확인한 인코딩을 넣어서 append
+        all_file.append(pd.read_csv(path ,encoding = charenc , index_col=False))
+    print(len(all_file))
+    for i in all_file:
+#        print(result['encoding'])
+        print(i.dtypes)
+        print(i)
+    
+    print('-----------------------------------------------------------')
+    # rawdata = open('C:\\Users\\ksy\\downloads\\data\\CARD_SUBWAY_MONTH_202105.csv', 'rb').read()
+    # result = chardet.detect(rawdata)
+    # charenc = result['encoding']
+    # print(charenc)
+    # test = pd.read_csv('C:\\Users\\ksy\\downloads\\data\\CARD_SUBWAY_MONTH_202105.csv' , encoding=charenc , index_col=False)
+    # print(test.dtypes)
+    # print(test.head())
 
+    # 위에서 모든 엑셀 파일을 열어서 내용을 담은 all_file을 같은 컬럼이니 합친다.
+    all_data = pd.concat(all_file, ignore_index=True)
+    print(all_data)
+#    print(all_data.dtypes)
 
 #corona()
 #subway()
-subway_st()
-
+#subway_st()
+subway_all_file()
 
 
 # df = df.sort_values(by='날짜').reset_index(drop=True) 
@@ -256,5 +290,7 @@ subway_st()
 # for i in range(2,10):
 #     a = './data/semiproject_data/seoul subway days/CARD_SUBWAY_MONTH_20200'+str(i)+'.csv'
 #     print(a)
+
+# %%
 
 # %%
