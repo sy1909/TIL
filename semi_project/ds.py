@@ -246,38 +246,71 @@ def subway_all_file():
     
     print('-----------------------------------------------------------')
 
-
+from matplotlib import rcParams
+from matplotlib import font_manager, rc
+import matplotlib
+matplotlib.font_manager._rebuild()
 def gu_corona():
+    
     file_path = 'C:\\Users\\ksy\\downloads\\서울특별시 코로나19 자치구별 확진자 발생동향.csv'
     pdata = pd.read_csv(file_path , encoding ='cp949' , index_col=False)
+    # 날짜 변환
+    pdata["자치구 기준일"] = pd.to_datetime(pdata["자치구 기준일"])# , format='%Y%m%d')
+    # 날짜기준 정렬
+    pdata = pdata.sort_values(by = ['자치구 기준일'])  
     print(pdata)
     print(pdata.dtypes)
+
     # 행열전환 자치구가 행으로 확진자수가  자세한 설명 아래 링크 참조
     # https://computer-science-student.tistory.com/158
     pdata = pdata.transpose()
     pdata.rename(columns = pdata.iloc[0] , inplace=True)
     pdata = pdata.drop(pdata.index[0])
     print(pdata)
+    #------------------------------------------------------------
     print()
     print(pdata[1::2]) #추가 부분
     print(pdata[0::2]) #전체 부분만
+
     # 종로 - 기타
     pdata_add = pdata[1::2]
-    pdata_all = pdata[0::2]
-    #pdata_all.columns[0]
-    df = pdata_all.sort_values(by = ['확진자수'], ascending = False)       
+    pdata_all = pdata[0:-1:2]
 
-    # 누적 확진자 수 기준 파이 차트 그리기
-    # 시계 방향(12시, 90도), Top 5순
-    _, _, autopct = plt.pie(df['확진자수'], explode = explode, labels = df.index, shadow = True, autopct = '', startangle = 90, counterclock = False)
+    print(pdata_all.columns)
+    print(type(pdata_all.columns))
+    print(pdata_add.columns[0])
+    print(len(pdata_all.index))
+    print(len(pdata_add[pdata_add.columns[0]]))
 
-    # 각각의 파이 안에 들어가는 레이블 중 Top 5만 설정
-    for i in range(5):
-        autopct[i].set_text('{:,}'.format(df['확진자수'][i]))
-
-    plt.title('서울시 코로나 확진자 현황(자치구별)')
-    plt.xlabel('단위(명)')
+    #한글깨짐 폰트설정
+    font_path = 'C:\\Users\\ksy\\Downloads\\MaruBuri-Regular\\MaruBuri-Regular.ttf'
+    font = font_manager.FontProperties(fname=font_path, size=18).get_name()
+    rc('font' , family = font)
+    plt.rcParams['axes.unicode_minus'] = False #한글 폰트 사용시 마이너스 폰트 깨짐 해결
+    
+    #파이차트
+    plt.pie(pdata_add[pdata_add.columns[-1]], labels=pdata_all.index, autopct='%.1f%%')
+    plt.title(str(pdata_add.columns[-1]) , fontsize = 15)
     plt.show()
+
+    #종로구 전체에대해서 확진자수 그래프 index[0]에서 0을 i로주고 반복문 돌리면 전체 자치구
+    print(pdata_all.loc[pdata_all.index[0]])
+    plt.plot(pdata_all.columns , pdata_all.loc[pdata_all.index[0]])
+    plt.title(pdata_all.index[0],fontsize=15)
+    plt.show()
+    # df = pdata_all.sort_values(by = ['확진자수'], ascending = False)       
+
+    # # 누적 확진자 수 기준 파이 차트 그리기
+    # # 시계 방향(12시, 90도), Top 5순
+    # _, _, autopct = plt.pie(df['확진자수'], explode = explode, labels = df.index, shadow = True, autopct = '', startangle = 90, counterclock = False)
+
+    # # 각각의 파이 안에 들어가는 레이블 중 Top 5만 설정
+    # for i in range(5):
+    #     autopct[i].set_text('{:,}'.format(df['확진자수'][i]))
+
+    # plt.title('서울시 코로나 확진자 현황(자치구별)')
+    # plt.xlabel('단위(명)')
+    # plt.show()
 
 #corona()
 #subway()
