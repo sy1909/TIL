@@ -158,13 +158,11 @@ def subway_st(all_data):
     for j in seoul_station: # 여기서 단어를 비교
         for i in station:   # statiion 내부 값에 () 가 추가로 붙어있음
             #print(j.find(i))
-            if i.find(j) == 0 and i not in same_st:
+            if i.find(j) >= 0 and i not in same_st:
                 if i==j:
                     same_st.append(i)
                 elif i.find(j+"(")==0:
-                    same_st.append(i) 
-                else:
-                    pass                   
+                    same_st.append(i)   
             elif i == "신촌" and j == "신촌(2)":
                 same_st.append(j)
             elif i == "신촌" and j == "신촌(경)":
@@ -172,15 +170,10 @@ def subway_st(all_data):
             elif i == "양평" and j == "양평(5)":
                 same_st.append(j)
 
-    cnt = 0
-    ncnt = 0
-    for i in all_data["역명"].unique():
-        if i in same_st:
-            cnt +=1
-        else:
-            ncnt +=1
+    print( all_data[all_data["역명"] == '신촌'])
+    print( all_data[all_data["역명"] == '양평'])
 
-    print("카운트  " , cnt , ncnt)
+    print("station , seoul_station , same_st  " , len(station) , len(seoul_station) , len(same_st))
     print("---------------------------------------------------------------------")
     print("분류되기 전에 역명의 길이"  ,  len(all_data["역명"].unique()))
     seoul_data = all_data[ all_data["역명"].isin(same_st) ]
@@ -198,6 +191,7 @@ def subway_all_file():
     # 해당 디렉토리 내에 .csv 파일을 다 불러와서 리스트에 담아준다.
     file_path = glob('C:\\Users\\ksy\\downloads\\data\\*.csv')
     all_file = []
+    print(file_path)
     #인코딩 확인 코드-----------------------------------------------
     for path in file_path:
         rawdata = open(path, 'rb').read() #파일 열고
@@ -208,9 +202,10 @@ def subway_all_file():
         # utf8 error -> engine='python' 으로 해결 (무시하는듯 한글깨짐) 
         # 위에서 확인한 인코딩을 넣어서 append
         #위에 인코딩 확인코드 시간 줄일 필요 있을 듯 
-        all_file.append(pd.read_csv(path ,encoding = charenc , index_col=False))
-    #print(len(all_file))
-
+        csvfile = pd.read_csv(path ,encoding = charenc , index_col=False)
+        all_file.append(csvfile)
+        #print(csvfile.head())
+    
     # 위에서 모든 엑셀 파일을 열어서 내용을 담은 all_file을 같은 컬럼이니 합친다.
     all_data = pd.concat(all_file, ignore_index=True)
     all_data["사용일자"] = pd.to_datetime(all_data["사용일자"], format='%Y%m%d')
@@ -373,16 +368,38 @@ def gu_corona():
     plt.title(pdata_all.index[0],fontsize=15)
     plt.show()
 
+def gu_gu():
+    file_path = 'C:\\Users\\ksy\\downloads\\서울역.csv'
+    pdata = pd.read_csv(file_path , encoding ='cp949' , index_col=False)
+    print(pdata.columns)
+    print(pdata[pdata.columns[1]])
 
+    # 위에 함수들에서 추출가능
+    gu_lst = ['종로구','중구','용산구','성동구','광진구','동대문구','중랑구','성북구',
+'강북구','도봉구','노원구','은평구','서대문구','마포구','양천구','강서구',
+'구로구','금천구','영등포구','동작구','관악구','서초구','강남구','송파구','강동구']
+    same_gu = []
+    for i in range(len(gu_lst)):
+        same_gu.append([])
+        for j in range(len(pdata[pdata.columns[1]])): # 여기서 단어를 비교
+            #print(pdata[pdata.columns[1]][j].find(gu_lst[i]) )
+            if pdata[pdata.columns[1]][j].find(gu_lst[i]) >= 0 and gu_lst[i] not in same_gu[i]:
+                same_gu[i].append(pdata[pdata.columns[0]][j])
 
+    for i in range(len(same_gu)):
+        for j in same_gu[i]:
+            print(gu_lst[i] , j)
 
+# 해야할 내용
+# seoul_station 역명에 신촌 양평? 포함되지 않는거 해결
+# 전체적으로 이어서 사용할 수 있게 다듬기
 #corona()
 #subway()
 #subway_st()
-#subway_all_file()
-gu_corona()
-
-
+subway_all_file()
+#gu_corona()
+#gu_gu()
+#test()
 
 
 # %%
