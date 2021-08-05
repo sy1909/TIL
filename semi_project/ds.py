@@ -5,6 +5,19 @@ from statistics import mean
 import matplotlib.pyplot as plt # 막대그래프
 #import seaborn as sns  # 
 
+from matplotlib import rcParams
+import matplotlib
+from matplotlib import font_manager, rc
+matplotlib.font_manager._rebuild()
+import matplotlib.dates as mdates
+
+#한글깨짐 폰트설정
+font_path = 'C:\\Users\\ksy\\Downloads\\MaruBuri-Regular\\MaruBuri-Regular.ttf'
+font = font_manager.FontProperties(fname=font_path, size=18).get_name()
+rc('font' , family = font)
+plt.rcParams['axes.unicode_minus'] = False #한글 폰트 사용시 마이너스 폰트 깨짐 해결
+
+
 def corona(): # 파일 읽어오기
 #    file_path = 'C:\\Users\\ksy\\downloads\\CARD_SUBWAY_MONTH_202106.csv'
     file_path = 'C:\\Users\\ksy\\downloads\\total_corona_count.csv'
@@ -180,7 +193,7 @@ def subway_st(all_data):
     print("---------------------------------------------------------------------")
     print("분류된 역명의 길이 " , len(seoul_data["역명"].unique()))
     print("---------------------------------------------------------------------")
-    print(seoul_data)
+    print(seoul_data) # 위의 신촌 2개 양평 1개가 빠진 데이터 채워넣으면 된다.
     return seoul_data
 
 
@@ -233,21 +246,19 @@ def subway_all_file():
     print(pdata_sum)
 
 #----------------------------선그래프?----------------------
-    plt.plot(pdata_sum["사용일자"] , pdata_sum["승하차총승객수"])
-    plt.show()
+    #plt.plot(pdata_sum["사용일자"] , pdata_sum["승하차총승객수"])
+    #plt.show()
 #----------------------------막대그래프----------------------
-    plt.bar(pdata_sum["사용일자"] , pdata_sum["승하차총승객수"])
-    plt.show()
+    #plt.bar(pdata_sum["사용일자"] , pdata_sum["승하차총승객수"])
+    #plt.show()
     
     print('-----------------------------------------------------------')
+    return all_data #잠깐 all_data 사용중 원래 pdata_sum 리턴
 
-from matplotlib import rcParams
-from matplotlib import font_manager, rc
-import matplotlib
+
 from matplotlib import colors as mcolors
 #import datetime
-matplotlib.font_manager._rebuild()
-import matplotlib.dates as mdates
+
 def gu_corona():
     
     file_path = 'C:\\Users\\ksy\\downloads\\서울특별시 코로나19 자치구별 확진자 발생동향.csv'
@@ -283,12 +294,6 @@ def gu_corona():
     print(len(pdata_all.index))
     print(len(pdata_add[pdata_add.columns[0]]))
 
-    #한글깨짐 폰트설정
-    font_path = 'C:\\Users\\ksy\\Downloads\\MaruBuri-Regular\\MaruBuri-Regular.ttf'
-    font = font_manager.FontProperties(fname=font_path, size=18).get_name()
-    rc('font' , family = font)
-    plt.rcParams['axes.unicode_minus'] = False #한글 폰트 사용시 마이너스 폰트 깨짐 해결
-    
     #파이차트
     #plt.pie(pdata_add[pdata_add.columns[-1]], labels=pdata_all.index, autopct='%.1f%%')
     #plt.title(str(pdata_add.columns[-1]) , fontsize = 15)
@@ -316,7 +321,8 @@ def gu_corona():
     #     print(i.year , i.month , i.day)
     #     if i.month == 2:
     #         print(i.month)
-
+    
+    pdata_sum = subway_all_file()
     # 비교위해 리스트 datetime 으로 변환 
     georidoogi_start = pd.to_datetime(georidoogi_start , format = '%Y.%m.%d')
     georidoogi_end = pd.to_datetime(georidoogi_end , format = '%Y.%m.%d')
@@ -324,7 +330,7 @@ def gu_corona():
 
     temp_start = []
     temp_end = []
-    for idx , i in enumerate(pdata_all.columns):
+    for idx , i in enumerate(pdata_sum['사용일자']):
         for j in georidoogi_start:
             if i == j:
                 #print(i)
@@ -350,23 +356,32 @@ def gu_corona():
     sorted_names = [name for hsv, name in by_hsv]
     print(len(sorted_names))
 #--------------------------------------------------------------------------------------
-
+    
     #pdata_all_x = pdata.columns.to_list()
     pdata_all_x = [date.to_pydatetime() for date in pdata.columns ]
     pdata_all_y = pdata_all.loc[pdata_all.index[0]].to_list()
+
+    pdata_sum_x = pdata_sum['사용일자'].to_list()
+    pdata_sum_y = pdata_sum['승하차총승객수'].to_list()
+    print(';;;;;;;;;;;;;;;;;;;;;;;')
+    print(pdata_sum_x[temp_start[0]:temp_end[0]])
+    print(pdata_sum_y[temp_start[0]:temp_end[0]])
 
     #ymin = pdata_all.loc[pdata_all.index[0]].min()
     #ymax = pdata_all.loc[pdata_all.index[0]].max()
     #print("y축 최소 최대 " , ymin , ymax)
     # columns 는 날짜  /  index[0] - 자치구들
-    plt.plot(pdata_all_x , pdata_all_y)
+    #plt.plot(pdata_all_x , pdata_all_y)
+    #plt.plot(pdata_sum_x , pdata_sum_y)
     #plt.ylim(ymin , ymax)
-    for i in range(0, len(temp_start)):
-        plt.fill_between( pdata_all_x[temp_start[i]:temp_end[i]] , pdata_all_y[temp_start[i]:temp_end[i]] , facecolor=sorted_names[i*14] , alpha=0.5) # alpha : 투명도 
-        #plt.fill_between( pdata_all_x[georidoogi_start[i]:georidoogi_end[i]] , pdata_all_y[georidoogi_start[i]:georidoogi_end[i]], facecolor=sorted_names[i] , alpha=0.5)
+    # for i in range(0, len(temp_start)):
+    #     #plt.fill_between( pdata_all_x[temp_start[i]:temp_end[i]] , pdata_all_y[temp_start[i]:temp_end[i]] , facecolor=sorted_names[i*14] , alpha=0.5) # alpha : 투명도 
+    #     plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] , pdata_sum_y[temp_start[i]:temp_end[i]], facecolor=sorted_names[i*14] , alpha=0.5)
     
-    plt.title(pdata_all.index[0],fontsize=15)
-    plt.show()
+    # plt.title(pdata_all.index[0],fontsize=15)
+    # plt.show()
+
+
 
 def gu_gu():
     file_path = 'C:\\Users\\ksy\\downloads\\서울역.csv'
@@ -390,16 +405,79 @@ def gu_gu():
         for j in same_gu[i]:
             print(gu_lst[i] , j)
 
+import seaborn as sns
+def gu_subway():
+    file_path = 'C:\\Users\\ksy\\downloads\\seoul_gu.csv'
+    pdata = pd.read_csv(file_path , encoding ='utf-8' , index_col=False)
+    print(pdata)
+    # 20년2월부터 21년7월까지 전체 데이터
+    all_data = subway_all_file()
+    print(all_data)
+    # 새로운 컬럼 생성 승하차총승객수
+    all_data['승하차총승객수'] = all_data["승차총승객수"] + all_data["하차총승객수"]
+    print(all_data)
+
+    #all_data["자치구"] = all_data[ all_data["역명"] == pdata['역명']
+    add_gu_data = pd.merge(all_data , pdata, how='left', on='역명' )
+    print(add_gu_data)
+    print(add_gu_data.info()) #left 조인을 안하면 자치구가 3개 더 들어온다.
+    print(add_gu_data['자치구'].unique())
+    # \xa0 없애는 코드
+    add_gu_data['자치구'] = add_gu_data['자치구'].str.split().str.join(' ')
+    print(add_gu_data['자치구'].unique())
+
+    #print(add_gu_data['승하차총승객수'])
+    add_gu_data = add_gu_data[ ['사용일자','승하차총승객수','자치구'] ]
+    print(add_gu_data[['사용일자','승하차총승객수','자치구']])
+    #['사용일자'] = add_gu_data['사용일자'].values.astype(float)
+ 
+    # 그룹별 집계하는 방법 - 일자별 집계
+    add_gu_data = add_gu_data.groupby(['자치구','사용일자'], as_index = False)['승하차총승객수'].sum()
+    print(add_gu_data.head())
+    #add_gu_data.to_csv('C:\\Users\\ksy\\downloads\\seoul_gu_group.csv' , header=False , index=False)
+
+    add_gu_data_top = add_gu_data.groupby(['자치구'], as_index = False)['승하차총승객수'].sum()
+    add_gu_data_top = add_gu_data_top.sort_values(by= "승하차총승객수" , ascending=True)
+    print(add_gu_data_top["자치구"])
+    
+    # 시각화 부분-------------------------------------------------------------------------------------------------------
+    # lineplot 써서 모든 그래프 출력 자치구별로 색깔 자동변함
+    ax = sns.lineplot(x='사용일자', 
+                    y='승하차총승객수',
+                    hue='자치구',
+                     data=add_gu_data)
+    plt.show()
+
+    # 자치구 별로 4개씩 묶어서 출력
+    cnt = 0
+    tit = ""
+    for i in add_gu_data['자치구'].unique():
+        tit =  tit + i + ","
+        #print(tit)
+        plt.ylim(0 , 1500000)
+        plt.plot(add_gu_data[add_gu_data['자치구']==i]['사용일자'].to_list() , add_gu_data[add_gu_data['자치구']==i]['승하차총승객수'].to_list())
+        if cnt %4 == 0:
+            plt.title( tit ,fontsize=15)
+            plt.show()   
+            plt.cla()
+            tit = ""
+        elif cnt == len(add_gu_data['자치구'].unique())-1:
+            plt.title( tit ,fontsize=15)
+            plt.show()     
+        cnt+=1
+    # 시각화 부분-------------------------------------------------------------------------------------------------------
+
+
 # 해야할 내용
 # seoul_station 역명에 신촌 양평? 포함되지 않는거 해결
 # 전체적으로 이어서 사용할 수 있게 다듬기
 #corona()
 #subway()
 #subway_st()
-subway_all_file()
+#subway_all_file()
 #gu_corona()
 #gu_gu()
-#test()
+gu_subway()
 
 
 # %%
