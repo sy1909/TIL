@@ -388,33 +388,18 @@ def gu_corona():
 #    yellow greenyellow  peru orangered crimson 
     # plt.ylim([-100 , 12000000])
     # 4단계 crimson
-
-    #범례 순서대로 조작하는 구간
-    plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor='yellow' , alpha=1 , label='1단계')
-    plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor='greenyellow' , alpha=1 , label='1.5단계')
-    plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor='peru' , alpha=1 , label='2단계')
-    plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor='orangered' , alpha=1 , label='2.5단계')
-    plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor='crimson' , alpha=1 , label='4단계')
+    clr_list = ['yellow','greenyellow','peru','orangered','crimson']
+    dangye = ['1단계','1.5단계','2단계','2.5단계','4단계']
+    dan = ['1단','1.5','2단','2.5','4']
+    # 범례를 쓰기위한 구간
+    for idx , i in enumerate(clr_list):
+        plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor=i , alpha=1 , label=dangye[idx])
     
     # 실제로 색을 입히는 구간 
     for i in range(0, len(temp_start)):
-        #plt.fill_between( pdata_all_x[temp_start[i]:temp_end[i]] , pdata_all_y[temp_start[i]:temp_end[i]] , facecolor=sorted_names[i*14] , alpha=0.5) # alpha : 투명도 
-        # plt.fill_between( pdata_sum_x[temp_start[i]:temp_start[i]+3] , pdata_sum_y[temp_start[i]:temp_start[i]+3], facecolor=sorted_names[i*12] , alpha=0.5)
-        #plt.fill_between( pdata_sum_x[temp_start[i]:temp_start[i]+3] , 12000000 , alpha=0.5) #수직선으로 채운다 
-        if georidoogi_gov_summa[i].find('1단') >= 0:
-            plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor='yellow' , alpha=1)
-        elif georidoogi_gov_summa[i].find('1.5')>= 0:
-            plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor='greenyellow' , alpha=1)    
-        elif georidoogi_gov_summa[i].find('2단')>= 0:
-            plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor='peru' , alpha=1)
-        elif georidoogi_gov_summa[i].find('2.5')>= 0:
-            plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor='orangered' , alpha=1)
-        elif georidoogi_gov_summa[i].find('4')>= 0:
-            plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor='crimson' , alpha=1)
-        else:
-            plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor='snow' , alpha=0.5)
-        # 범례 정렬이 안되어있다. 정렬하면 좋다.
-        #
+        for idx, j in enumerate(dan):
+            if georidoogi_gov_summa[i].find(j) >= 0:
+                plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor=clr_list[idx] , alpha=1)
 
 
         # if i%2 ==0:
@@ -424,10 +409,6 @@ def gu_corona():
     plt.legend(loc = 'upper left')  
     plt.title("서울 유동인구 , 신규확진자수 그래프 ",fontsize=15)
     plt.show()
-
-
-
-
 
 def gu_gu():
     file_path = 'C:\\Users\\ksy\\downloads\\서울역.csv'
