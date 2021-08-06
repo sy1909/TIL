@@ -222,8 +222,8 @@ def subway_all_file():
     # 위에서 모든 엑셀 파일을 열어서 내용을 담은 all_file을 같은 컬럼이니 합친다.
     all_data = pd.concat(all_file, ignore_index=True)
     all_data["사용일자"] = pd.to_datetime(all_data["사용일자"], format='%Y%m%d')
-    print("전체 엑셀 데이터가 합쳐진 첫번째")
-    print(all_data)
+    #print("전체 엑셀 데이터가 합쳐진 첫번째")
+    #print(all_data)
 
     # 이제 모아놓은 전 엑셀 데이터를 서울을 주소지로 갖는 역으로 필터링 해주어야 한다.
     all_data = subway_st(all_data)
@@ -232,16 +232,12 @@ def subway_all_file():
 
 #--시각화 진행 함수로 만들기도 가능----------------------------------------------------------------------------------
     subway_col = [i for i in all_data.columns]
-    #종합 통계를 불러오는 함수
-    #print(all_data.describe())
 
     # 새로운 컬럼 생성 (승하차총승객수)
     all_data["승하차총승객수"] = all_data["승차총승객수"] + all_data["하차총승객수"]
-    #print(all_data.head())
 
     # 사용일자 별로 묶어서 승하차총승객수만 나오는 테이블 저장
     pdata_sum = all_data.groupby(['사용일자'], as_index = False)["승하차총승객수"].sum()
-#    pdata_sum = pdata.groupby(['사용일자'])["승하차총승객수"].sum()
     print( "pdata_sum groupby 사용일자 승하차총승객수" )
     print(pdata_sum)
 
@@ -258,7 +254,6 @@ def subway_all_file():
 
 from matplotlib import colors as mcolors
 #import datetime
-
 def gu_corona():
     
     file_path = 'C:\\Users\\ksy\\downloads\\서울특별시 코로나19 자치구별 확진자 발생동향.csv'
@@ -272,27 +267,39 @@ def gu_corona():
     pdata["자치구 기준일"] = pd.to_datetime(pdata["자치구 기준일"] , format = '%Y.%m.%d')
     # 날짜기준 정렬
     pdata = pdata.sort_values(by = ['자치구 기준일'])  
+#--------------------------------------------------------------------
+    # pd.set_option('mode.chained_assignment',  None) # ↓자꾸 에러떠서 경고문 끔
+    
+    # 자치구별 신규확진자수 추출해 데이터프레임생성 -------------------
+    new = pdata.filter(regex='기준일|추가') # 아래랑 주석 바꾸려면 밑에 수치부분도 주석풀기
+    #new = pdata.filter(regex='기준일|전체')
+    new['총신규확진자수'] = new.iloc[:,1:26].sum(axis=1)
+    new = new[['자치구 기준일' , '총신규확진자수']]
+    print('???????????????????????????????????????????????????????')
+    print(new.head())
+
+#--------------------------------------------------------------------
 
     # 행열전환 자치구가 행으로 확진자수가  자세한 설명 아래 링크 참조
     # https://computer-science-student.tistory.com/158
     pdata = pdata.transpose()
     pdata.rename(columns = pdata.iloc[0] , inplace=True)
     pdata = pdata.drop(pdata.index[0])
-    print(pdata)
-    #------------------------------------------------------------
-    print()
-    print(pdata[1::2]) #추가 부분
-    print(pdata[0::2]) #전체 부분만
+    # print(pdata)
+    # #------------------------------------------------------------
+    # print()
+    # print(pdata[1::2]) #추가 부분
+    # print(pdata[0::2]) #전체 부분만
 
     # 종로 - 기타
     pdata_add = pdata[1::2]
     pdata_all = pdata[0:-1:2]
 
-    print(pdata_all.columns)
-    print(type(pdata_all.columns))
-    print(pdata_add.columns[0])
-    print(len(pdata_all.index))
-    print(len(pdata_add[pdata_add.columns[0]]))
+    # print(pdata_all.columns)
+    # print(type(pdata_all.columns))
+    # print(pdata_add.columns[0])
+    # print(len(pdata_all.index))
+    # print(len(pdata_add[pdata_add.columns[0]]))
 
     #파이차트
     #plt.pie(pdata_add[pdata_add.columns[-1]], labels=pdata_all.index, autopct='%.1f%%')
@@ -300,7 +307,7 @@ def gu_corona():
     #plt.show()
 
     #종로구 전체에대해서 확진자수 그래프 index[0]에서 0을 i로주고 반복문 돌리면 전체 자치구
-    print( pdata_all.loc[pdata_all.index[0]] )
+    # print( pdata_all.loc[pdata_all.index[0]] )
     # columns 는 날짜  /  index[0] - 자치구들
     # plt.plot(pdata_all.columns , pdata_all.loc[pdata_all.index[0]])
     # plt.title(pdata_all.index[0],fontsize=15)
@@ -309,11 +316,12 @@ def gu_corona():
 #--------------------------------------------------------------------------------------
     #거리두기 단계별 시작과 끝 담기
     # df = pdata_all.sort_values(by = ['확진자수'], ascending = False)       
-                        #  거리두기    강화된거리두기     일부 조치완화    생활거리두기    3단계거리두기   4단계           5단계       특별대책      추가조치2단계       3인금지            
-    georidoogi_start =  ['2020-02-29' , '2020-03-22' , '2020-04-20' , '2020-05-06' , '2020-06-28' , '2020-08-28' , '2020-11-07' , '2020-12-24' , '2021-07-01' , '2021-07-12']
-    georidoogi_end =    ['2020-03-21' , '2020-04-27' , '2020-05-05' , '2020-06-27' , '2020-08-27' , '2020-11-06' , '2021-06-30' , '2021-03-14' , '2021-07-11' , '2021-08-08']
-    georidoogi_gov = [ '거리두기'  , '강화된거리두기' ,'일부 조치완화','생활거리두기', '3단계거리두기' , '4단계'  ,     '5단계'  ,  '특별대책'  ,   '추가조치2단계'   ,'3인금지']
-    print( len(georidoogi_start) , len(georidoogi_end) , len(georidoogi_gov))
+                        #  거리두기    강화된거리두기     일부 조치완화    생활거리두기    3단계거리두기   3단계거리두기   4단계거리두기  4단계거리두기  4단계거리두기   4단계거리두기       5단계         5단계         특별대책      특별대책            
+    georidoogi_start =  ['2020-02-29' , '2020-03-22' , '2020-04-20' , '2020-05-06' , '2020-06-28' , '2020-08-16', '2020-08-30' , '2020-09-14' , '2020-09-28' ,  '2020-10-12' , '2020-11-19', '2020-12-08', '2020-12-23', '2021-01-16', '2021-02-06', '2021-02-15', '2021-07-12']
+    georidoogi_end =    ['2020-03-21' , '2020-04-19' , '2020-05-05' , '2020-06-27' , '2020-08-15' , '2020-08-29' , '2020-09-13', '2021-09-27' , '2020-10-11' ,  '2020-11-18' , '2020-12-07', '2020-12-22', '2021-01-15', '2021-02-05', '2021-02-14', '2021-07-11', '2021-07-27'] # 8.8까지지만 자료가 7.27이 끝이므로
+    georidoogi_gov = [ '거리두기'  , '강화된거리두기' ,'일부 조치완화','생활거리두기', '3단계거리두기' , '3단계거리두기','4단계거리두기','4단계거리두기', '4단계거리두기','4단계거리두기','5단계거리두기','5단계거리두기','특별대책'   ,'특별대책' ,   '특별대책',   '추가조치',   '추가조치']
+    georidoogi_gov_summa = ['2단계' ,    '2.5단계',       '2단계',        '1단계',      '1단계'       , '2단계'  ,     '2.5단계',    '2단계',       '2.5단계',       '1+단계',       '1.5단계',    '2.5단계',    '2.5+단계',    '2.5-단계',  '2.5--단계',    '2단계',    '4+단계']
+    print( len(georidoogi_start) , len(georidoogi_end) , len(georidoogi_gov_summa))
     # 날짜 비교 확인 부분
     # print(type(pdata_all.columns))
     # for i in pdata_all.columns:
@@ -322,64 +330,102 @@ def gu_corona():
     #     if i.month == 2:
     #         print(i.month)
     
-    pdata_sum = subway_all_file()
+    all_data = subway_all_file()
+    pdata_sum = all_data.groupby(['사용일자'], as_index = False)["승하차총승객수"].sum()
+
+    new.rename(columns = {'자치구 기준일' : '사용일자'}, inplace = True)
+    pdata_sum = pd.merge( new ,pdata_sum, how='left', on='사용일자' )
+    pdata_sum['총신규확진자수'] = pdata_sum['총신규확진자수'].values * 12000  # 추가확진자(신규확진자)
+    # pdata_sum['총신규확진자수'] = pdata_sum['총신규확진자수'].values * 180 # 누적확진자수그래프           
+    print(pdata_sum)
+
     # 비교위해 리스트 datetime 으로 변환 
     georidoogi_start = pd.to_datetime(georidoogi_start , format = '%Y.%m.%d')
     georidoogi_end = pd.to_datetime(georidoogi_end , format = '%Y.%m.%d')
-    print(georidoogi_start , type(georidoogi_start))
-
+    # pdata_sum 내부에 날짜의 index를 담기위함
     temp_start = []
     temp_end = []
     for idx , i in enumerate(pdata_sum['사용일자']):
         for j in georidoogi_start:
             if i == j:
-                #print(i)
                 temp_start.append(idx)
         for k in georidoogi_end:
             if i ==k:
-                #print( "끝나는 " , i)
                 temp_end.append(idx)
             if i.year == 2021 and i.month == 7 and i.day == 27:
                 if idx not in temp_end:
                     temp_end.append(idx)
 
-    print(georidoogi_start)
-    print(georidoogi_end.to_list())
-    print(temp_start)
-    print(temp_end)
-    print("색상")
+    print("거리두기 정책 시작일 " ,len(temp_start) ,  temp_start) #실제 index 가 담겨있다.
+    print("거리두기 정책 종료일 " ,len(temp_end) , temp_end)
+    print(pdata_sum['사용일자'][516])
+
     # 색상 리스트 불러오는 구간---------------------------------------------------------
     colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
     # Sort colors by hue, saturation, value and name.
     by_hsv = sorted((tuple(mcolors.rgb_to_hsv(mcolors.to_rgba(color)[:3])), name)
                     for name, color in colors.items())
     sorted_names = [name for hsv, name in by_hsv]
-    print(len(sorted_names))
-#--------------------------------------------------------------------------------------
-    
-    #pdata_all_x = pdata.columns.to_list()
-    pdata_all_x = [date.to_pydatetime() for date in pdata.columns ]
+    print("색상 개수 " , len(sorted_names))
+    #--------------------------------------------------------------------------------------
+    # pdata_all_x = [date.to_pydatetime() for date in pdata.columns ]
+    pdata_all_x = pdata.columns.to_list()
     pdata_all_y = pdata_all.loc[pdata_all.index[0]].to_list()
 
     pdata_sum_x = pdata_sum['사용일자'].to_list()
     pdata_sum_y = pdata_sum['승하차총승객수'].to_list()
-    print(';;;;;;;;;;;;;;;;;;;;;;;')
-    print(pdata_sum_x[temp_start[0]:temp_end[0]])
-    print(pdata_sum_y[temp_start[0]:temp_end[0]])
+    print("pdata_sum_x 의 개수는 " , len(pdata_sum_x))
 
-    #ymin = pdata_all.loc[pdata_all.index[0]].min()
-    #ymax = pdata_all.loc[pdata_all.index[0]].max()
     #print("y축 최소 최대 " , ymin , ymax)
     # columns 는 날짜  /  index[0] - 자치구들
-    #plt.plot(pdata_all_x , pdata_all_y)
-    #plt.plot(pdata_sum_x , pdata_sum_y)
-    #plt.ylim(ymin , ymax)
-    # for i in range(0, len(temp_start)):
-    #     #plt.fill_between( pdata_all_x[temp_start[i]:temp_end[i]] , pdata_all_y[temp_start[i]:temp_end[i]] , facecolor=sorted_names[i*14] , alpha=0.5) # alpha : 투명도 
-    #     plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] , pdata_sum_y[temp_start[i]:temp_end[i]], facecolor=sorted_names[i*14] , alpha=0.5)
+    # 선 그래프
+    # plt.plot(pdata_all_x , pdata_all_y)
+    # plt.plot(pdata_sum_x , pdata_sum['총신규확진자수'].to_list())        
+    # plt.plot(pdata_sum_x , pdata_sum_y)
+    # 막대 그래프
+    plt.bar(pdata_sum_x , pdata_sum_y, alpha=0.5)   
+    plt.plot(pdata_sum_x , pdata_sum['총신규확진자수'].to_list() , color='black' , linewidth=2.0 , label = 'corona')
+#    yellow greenyellow  peru orangered crimson 
+    # plt.ylim([-100 , 12000000])
+    # 4단계 crimson
+
+    #범례 순서대로 조작하는 구간
+    plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor='yellow' , alpha=1 , label='1단계')
+    plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor='greenyellow' , alpha=1 , label='1.5단계')
+    plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor='peru' , alpha=1 , label='2단계')
+    plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor='orangered' , alpha=1 , label='2.5단계')
+    plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor='crimson' , alpha=1 , label='4단계')
     
-    # plt.title(pdata_all.index[0],fontsize=15)
-    # plt.show()
+    # 실제로 색을 입히는 구간 
+    for i in range(0, len(temp_start)):
+        #plt.fill_between( pdata_all_x[temp_start[i]:temp_end[i]] , pdata_all_y[temp_start[i]:temp_end[i]] , facecolor=sorted_names[i*14] , alpha=0.5) # alpha : 투명도 
+        # plt.fill_between( pdata_sum_x[temp_start[i]:temp_start[i]+3] , pdata_sum_y[temp_start[i]:temp_start[i]+3], facecolor=sorted_names[i*12] , alpha=0.5)
+        #plt.fill_between( pdata_sum_x[temp_start[i]:temp_start[i]+3] , 12000000 , alpha=0.5) #수직선으로 채운다 
+        if georidoogi_gov_summa[i].find('1단') >= 0:
+            plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor='yellow' , alpha=1)
+        elif georidoogi_gov_summa[i].find('1.5')>= 0:
+            plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor='greenyellow' , alpha=1)    
+        elif georidoogi_gov_summa[i].find('2단')>= 0:
+            plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor='peru' , alpha=1)
+        elif georidoogi_gov_summa[i].find('2.5')>= 0:
+            plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor='orangered' , alpha=1)
+        elif georidoogi_gov_summa[i].find('4')>= 0:
+            plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor='crimson' , alpha=1)
+        else:
+            plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor='snow' , alpha=0.5)
+        # 범례 정렬이 안되어있다. 정렬하면 좋다.
+        #
+
+
+        # if i%2 ==0:
+        #     plt.text(pdata_sum_x[temp_start[i]], 100000, georidoogi_gov_summa[i], fontsize=15,color='g',va='baseline',ha='left')
+        # else:
+        #     plt.text(pdata_sum_x[temp_start[i]], -100000, georidoogi_gov_summa[i])
+    plt.legend(loc = 'upper left')  
+    plt.title("서울 유동인구 , 신규확진자수 그래프 ",fontsize=15)
+    plt.show()
+
+
 
 
 
@@ -439,7 +485,7 @@ def gu_subway():
     add_gu_data_top = add_gu_data.groupby(['자치구'], as_index = False)['승하차총승객수'].sum()
     add_gu_data_top = add_gu_data_top.sort_values(by= "승하차총승객수" , ascending=True)
     print(add_gu_data_top["자치구"])
-    
+
     # 시각화 부분-------------------------------------------------------------------------------------------------------
     # lineplot 써서 모든 그래프 출력 자치구별로 색깔 자동변함
     ax = sns.lineplot(x='사용일자', 
@@ -448,36 +494,43 @@ def gu_subway():
                      data=add_gu_data)
     plt.show()
 
+
+def last_subway_corona():
+    subway_all_file()
+
+
     # 자치구 별로 4개씩 묶어서 출력
-    cnt = 0
-    tit = ""
-    for i in add_gu_data['자치구'].unique():
-        tit =  tit + i + ","
-        #print(tit)
-        plt.ylim(0 , 1500000)
-        plt.plot(add_gu_data[add_gu_data['자치구']==i]['사용일자'].to_list() , add_gu_data[add_gu_data['자치구']==i]['승하차총승객수'].to_list())
-        if cnt %4 == 0:
-            plt.title( tit ,fontsize=15)
-            plt.show()   
-            plt.cla()
-            tit = ""
-        elif cnt == len(add_gu_data['자치구'].unique())-1:
-            plt.title( tit ,fontsize=15)
-            plt.show()     
-        cnt+=1
+    # cnt = 0
+    # tit = ""
+    # for i in add_gu_data['자치구'].unique():
+    #     tit =  tit + i + ","
+    #     #print(tit)
+    #     plt.ylim(0 , 1500000)
+    #     plt.plot(add_gu_data[add_gu_data['자치구']==i]['사용일자'].to_list() , add_gu_data[add_gu_data['자치구']==i]['승하차총승객수'].to_list())
+    #     if cnt %4 == 0:
+    #         plt.title( tit ,fontsize=15)
+    #         plt.show()   
+    #         plt.cla()
+    #         tit = ""
+    #     elif cnt == len(add_gu_data['자치구'].unique())-1:
+    #         plt.title( tit ,fontsize=15)
+    #         plt.show()     
+    #     cnt+=1
     # 시각화 부분-------------------------------------------------------------------------------------------------------
 
+    # sns.scatterplot(x='사용일자', y='승하차총승객수', data=add_gu_data)
+    # plt.show()
 
 # 해야할 내용
 # seoul_station 역명에 신촌 양평? 포함되지 않는거 해결
 # 전체적으로 이어서 사용할 수 있게 다듬기
-#corona()
-#subway()
-#subway_st()
-#subway_all_file()
-#gu_corona()
-#gu_gu()
-gu_subway()
-
+#corona()            # 전체 확진자 수
+#subway()            # 서울 지하철 승하차 1개 파일로 조작 익숙해지기
+#subway_st()         # 서울에 주소지를 둔 지하철 노선만 가져오기 분류 함수
+#subway_all_file()   # 전체 서울승하차 파일 합치기
+gu_corona()         # 자치구별 확진자 발생동향 시각화 나중에 자치구별 합쳐서 전체로 사용
+#gu_gu()             # 자치구별로 서울승하차인원 파일 분류
+#gu_subway()          # 최종 자치구별 서울승하차인원 분류 후 시각화까지
+ 
 
 # %%
