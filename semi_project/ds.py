@@ -376,36 +376,20 @@ def gu_corona():
     pdata_sum_y = pdata_sum['승하차총승객수'].to_list()
     print("pdata_sum_x 의 개수는 " , len(pdata_sum_x))
 
-    #print("y축 최소 최대 " , ymin , ymax)
-    # columns 는 날짜  /  index[0] - 자치구들
-    # 선 그래프
-    # plt.plot(pdata_all_x , pdata_all_y)
-    # plt.plot(pdata_sum_x , pdata_sum['총신규확진자수'].to_list())        
-    # plt.plot(pdata_sum_x , pdata_sum_y)
-    # 막대 그래프
-    plt.bar(pdata_sum_x , pdata_sum_y, alpha=0.5)   
-    plt.plot(pdata_sum_x , pdata_sum['총신규확진자수'].to_list() , color='black' , linewidth=2.0 , label = 'corona')
-#    yellow greenyellow  peru orangered crimson 
-    # plt.ylim([-100 , 12000000])
-    # 4단계 crimson
-    clr_list = ['yellow','greenyellow','peru','orangered','crimson']
+    clr_list = ['aqua','deepskyblue','peru','orangered','crimson']
     dangye = ['1단계','1.5단계','2단계','2.5단계','4단계']
     dan = ['1단','1.5','2단','2.5','4']
+    
+    plt.plot(pdata_sum_x , pdata_sum['총신규확진자수'].to_list() , color='black' , linewidth=2.0 , label = 'corona')
     # 범례를 쓰기위한 구간
     for idx , i in enumerate(clr_list):
         plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor=i , alpha=1 , label=dangye[idx])
-    
-    # 실제로 색을 입히는 구간 
+           
+    # 구간별 색칠 막대그래프 생성  
     for i in range(0, len(temp_start)):
         for idx, j in enumerate(dan):
             if georidoogi_gov_summa[i].find(j) >= 0:
-                plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor=clr_list[idx] , alpha=1)
-
-
-        # if i%2 ==0:
-        #     plt.text(pdata_sum_x[temp_start[i]], 100000, georidoogi_gov_summa[i], fontsize=15,color='g',va='baseline',ha='left')
-        # else:
-        #     plt.text(pdata_sum_x[temp_start[i]], -100000, georidoogi_gov_summa[i])
+                plt.bar(pdata_sum_x[temp_start[i]:temp_end[i]] , pdata_sum_y[temp_start[i]:temp_end[i]],color = clr_list[idx] , alpha=1) 
     plt.legend(loc = 'upper left')  
     plt.title("서울 유동인구 , 신규확진자수 그래프 ",fontsize=15)
     plt.show()
@@ -433,25 +417,31 @@ def gu_gu():
             print(gu_lst[i] , j)
 
 import seaborn as sns
+import os 
+import folium
+from folium import plugins 
+print(folium.__version__)
+#googlemap
+import googlemaps
 def gu_subway():
     file_path = 'C:\\Users\\ksy\\downloads\\seoul_gu.csv'
     pdata = pd.read_csv(file_path , encoding ='utf-8' , index_col=False)
-    print(pdata)
+    #print(pdata)
     # 20년2월부터 21년7월까지 전체 데이터
     all_data = subway_all_file()
-    print(all_data)
+    #print(all_data)
     # 새로운 컬럼 생성 승하차총승객수
     all_data['승하차총승객수'] = all_data["승차총승객수"] + all_data["하차총승객수"]
-    print(all_data)
+    #print(all_data)
 
     #all_data["자치구"] = all_data[ all_data["역명"] == pdata['역명']
     add_gu_data = pd.merge(all_data , pdata, how='left', on='역명' )
-    print(add_gu_data)
-    print(add_gu_data.info()) #left 조인을 안하면 자치구가 3개 더 들어온다.
-    print(add_gu_data['자치구'].unique())
+    #print(add_gu_data)
+    #print(add_gu_data.info()) #left 조인을 안하면 자치구가 3개 더 들어온다.
+    #print(add_gu_data['자치구'].unique())
     # \xa0 없애는 코드
     add_gu_data['자치구'] = add_gu_data['자치구'].str.split().str.join(' ')
-    print(add_gu_data['자치구'].unique())
+    #print(add_gu_data['자치구'].unique())
 
     #print(add_gu_data['승하차총승객수'])
     add_gu_data = add_gu_data[ ['사용일자','승하차총승객수','자치구'] ]
@@ -477,7 +467,9 @@ def gu_subway():
 
 
 def last_subway_corona():
-    subway_all_file()
+    seoul_station_2020_map = folium.Map(location = [37.5502, 126.982],
+                                 zoom_start = 10.5,
+                                 tiles='cartodbpositron')
 
 
     # 자치구 별로 4개씩 묶어서 출력
@@ -509,9 +501,9 @@ def last_subway_corona():
 #subway()            # 서울 지하철 승하차 1개 파일로 조작 익숙해지기
 #subway_st()         # 서울에 주소지를 둔 지하철 노선만 가져오기 분류 함수
 #subway_all_file()   # 전체 서울승하차 파일 합치기
-gu_corona()         # 자치구별 확진자 발생동향 시각화 나중에 자치구별 합쳐서 전체로 사용
+#gu_corona()         # 자치구별 확진자 발생동향 시각화 나중에 자치구별 합쳐서 전체로 사용
 #gu_gu()             # 자치구별로 서울승하차인원 파일 분류
-#gu_subway()          # 최종 자치구별 서울승하차인원 분류 후 시각화까지
+gu_subway()          # 최종 자치구별 서울승하차인원 분류 후 시각화까지
  
 
 # %%

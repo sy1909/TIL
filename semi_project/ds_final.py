@@ -34,7 +34,7 @@ def subway_st(all_data):
                 same_st.append(j)
 
     seoul_data = all_data[ all_data["역명"].isin(same_st) ]
-    print(seoul_data) # 위의 신촌 2개 양평 1개가 빠진 데이터 채워넣으면 된다.
+    #print(seoul_data) # 위의 신촌 2개 양평 1개가 빠진 데이터 채워넣으면 된다.
     return seoul_data
 
 from glob import glob # 파일 경로를 조작할 수 있다.
@@ -42,7 +42,7 @@ import chardet
 def subway_all_file():
     file_path = glob('C:\\Users\\ksy\\downloads\\data\\*.csv')
     all_file = []
-    print(file_path)
+    #print(file_path)
     #인코딩 확인 코드-----------------------------------------------
     for path in file_path:
         rawdata = open(path, 'rb').read() #파일 열고
@@ -69,14 +69,15 @@ def subway_all_file():
     print('-----------------------------------------------------------')
     return all_data #잠깐 all_data 사용중 원래 pdata_sum 리턴
 
-def geori_index(georidoogi_start, georidoogi_end , pdata_sum):
+def geori_index(georidoogi_start, georidoogi_end , pdata_sum , georidoogi_gov_summa):
     # 비교위해 리스트 datetime 으로 변환 
     georidoogi_start = pd.to_datetime(georidoogi_start , format = '%Y.%m.%d')
     georidoogi_end = pd.to_datetime(georidoogi_end , format = '%Y.%m.%d')
+    pdata_sum_add_dangye = pdata_sum
     # pdata_sum 내부에 날짜의 index를 담기위함
     temp_start = []
     temp_end = []
-    for idx , i in enumerate(pdata_sum['사용일자']):
+    for idx , i in enumerate(pdata_sum['사용일자']): # i가 날짜들 
         for j in georidoogi_start:
             if i == j:
                 temp_start.append(idx)
@@ -87,14 +88,18 @@ def geori_index(georidoogi_start, georidoogi_end , pdata_sum):
                 if idx not in temp_end:
                     temp_end.append(idx)
 
-    return temp_start , temp_end
+    for i in range(0, len(temp_start)):
+        pdata_sum_add_dangye.loc[temp_start[i]:temp_end[i] , "dangye"] = georidoogi_gov_summa[i]
+
+    return temp_start , temp_end , pdata_sum_add_dangye
 
 from matplotlib import colors as mcolors
-# import plotly
-# import plotly.express as px
-# from plotly.subplots import make_subplots
-# import plotly.graph_objects as go
-# from plotly import tools
+import plotly
+import plotly.express as px
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+from plotly import tools
+import seaborn as sns
 def gu_corona():
     file_path = 'C:\\Users\\ksy\\downloads\\서울특별시 코로나19 자치구별 확진자 발생동향.csv'
     pdata = pd.read_csv(file_path , encoding ='cp949' , index_col=False)
@@ -116,7 +121,7 @@ def gu_corona():
     georidoogi_start =  ['2020-02-29' , '2020-03-22' , '2020-04-20' , '2020-05-06' , '2020-06-28' , '2020-08-16', '2020-08-30' , '2020-09-14' , '2020-09-28' ,  '2020-10-12' , '2020-11-19', '2020-12-08', '2020-12-23', '2021-01-16', '2021-02-06', '2021-02-15', '2021-07-12']
     georidoogi_end =    ['2020-03-21' , '2020-04-19' , '2020-05-05' , '2020-06-27' , '2020-08-15' , '2020-08-29' , '2020-09-13', '2021-09-27' , '2020-10-11' ,  '2020-11-18' , '2020-12-07', '2020-12-22', '2021-01-15', '2021-02-05', '2021-02-14', '2021-07-11', '2021-07-27'] # 8.8까지지만 자료가 7.27이 끝이므로
     georidoogi_gov = [ '거리두기'  , '강화된거리두기' ,'일부 조치완화','생활거리두기', '3단계거리두기' , '3단계거리두기','4단계거리두기','4단계거리두기', '4단계거리두기','4단계거리두기','5단계거리두기','5단계거리두기','특별대책'   ,'특별대책' ,   '특별대책',   '추가조치',   '추가조치']
-    georidoogi_gov_summa = ['2단계' ,    '2.5단계',       '2단계',        '1단계',      '1단계'       , '2단계'  ,     '2.5단계',    '2단계',       '2.5단계',       '1+단계',       '1.5단계',    '2.5단계',    '2.5+단계',    '2.5-단계',  '2.5--단계',    '2단계',    '4+단계']
+    georidoogi_gov_summa = ['2단계' ,    '2.5단계',       '2단계',        '1단계',      '1단계'       , '2단계'  ,     '2.5단계',    '2단계',       '2.5단계',       '1단계',       '1.5단계',    '2.5단계',    '2.5+단계',    '2.5-단계',  '2.5--단계',    '2단계',    '4+단계']
     print( len(georidoogi_start) , len(georidoogi_end) , len(georidoogi_gov_summa))
     
     # 서울시 내로 분류된 서울 승하차인원 데이터
@@ -130,10 +135,11 @@ def gu_corona():
     print(pdata_sum)
 
     # 서울승하차인원데이터에서 거리두기 날짜와 일치하는 index
-    temp_start , temp_end = geori_index(georidoogi_start , georidoogi_end , pdata_sum)
+    temp_start , temp_end , temp_dangye = geori_index(georidoogi_start , georidoogi_end , pdata_sum , georidoogi_gov_summa)
     print("거리두기 정책 시작일 " ,len(temp_start) ,  temp_start) #실제 index 가 담겨있다.
     print("거리두기 정책 종료일 " ,len(temp_end) , temp_end)
-    
+    print(temp_dangye)
+
     pdata = pdata.transpose()
     pdata.rename(columns = pdata.iloc[0] , inplace=True)
     pdata = pdata.drop(pdata.index[0])
@@ -148,36 +154,71 @@ def gu_corona():
     pdata_sum_x = pdata_sum['사용일자'].to_list()
     pdata_sum_y = pdata_sum['승하차총승객수'].to_list()
     print("pdata_sum_x 의 개수는 " , len(pdata_sum_x))
-
-    #--시각화-------------------------------------------------------------------------------------------------------------------------------
-    # fig = px.bar(subArea, x='사용일자', y='승하차총승객수', 
-    #             color = "자치구", color_discrete_sequence = px.colors.qualitative.Pastel)
+    
+#test중----------------------------------------------------------------------------------
+    # #--시각화-------------------------------------------------------------------------------------------------------------------------------
+    # fig = px.bar(x=pdata_sum_x, y=pdata_sum_y , color_discrete_sequence = px.colors.qualitative.Pastel) #, 
     # fig.update_layout(title='<b>서울시 자치구별 유동인구</b>', 
-    #                 plot_bgcolor="#FFFFFF",yaxis_gridcolor = '#D5D5D5')
+    #                 plot_bgcolor="#FFFFFF", yaxis_gridcolor = '#D5D5D5')
     # fig.show()
-#todo 리스트 해보기
-
-    plt.bar(pdata_sum_x , pdata_sum_y, alpha=0.5)   
-    plt.plot(pdata_sum_x , pdata_sum['총신규확진자수'].to_list() , color='black' , linewidth=2.0 , label = 'corona')
-#    yellow greenyellow  peru orangered crimson 
-    # plt.ylim([-100 , 12000000])
-    # 4단계 crimson
-    clr_list = ['yellow','greenyellow','peru','orangered','crimson']
+#test중----------------------------------------------------------------------------------
+    clr_list = ['aqua','deepskyblue','peru','orangered','crimson']
     dangye = ['1단계','1.5단계','2단계','2.5단계','4단계']
     dan = ['1단','1.5','2단','2.5','4']
     # 범례를 쓰기위한 구간
+    plt.plot(pdata_sum_x , pdata_sum['총신규확진자수'].to_list() , color='black' , linewidth=2.0 , label = 'corona')
+    # sns.barplot( temp_dangye['사용일자'].to_list() , temp_dangye['승하차총승객수'].to_list() ,hue = temp_dangye['dangye'])
+    # 범례를 쓰기위한 구간
     for idx , i in enumerate(clr_list):
         plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor=i , alpha=1 , label=dangye[idx])
-    
-    # 실제로 색을 입히는 구간 
+    # 구간별 색칠 막대그래프 생성  
     for i in range(0, len(temp_start)):
         for idx, j in enumerate(dan):
             if georidoogi_gov_summa[i].find(j) >= 0:
-                plt.fill_between( pdata_sum_x[temp_start[i]:temp_end[i]] ,  pdata_sum_y[temp_start[i]:temp_end[i]], facecolor=clr_list[idx] , alpha=1)
+                plt.bar(pdata_sum_x[temp_start[i]:temp_end[i]] , pdata_sum_y[temp_start[i]:temp_end[i]],color = clr_list[idx] , alpha=1) 
 
+    # plt.legend(loc = 'upper left')  
+    # plt.title("서울 유동인구 , 신규확진자수 그래프 ",fontsize=15)
+    # plt.show()
+
+    # 비율 구하려고 발악중--
+    georidoogi_start =  ['2020-02-29' , '2020-03-22' , '2020-04-20' , '2020-05-06'  , '2020-08-16', '2020-08-30' , '2020-09-14' , '2020-09-28' ,  '2020-10-12' , '2020-11-19', '2020-12-08', '2021-02-15', '2021-07-12']
+    georidoogi_end =    ['2020-03-21' , '2020-04-19' , '2020-05-05' , '2020-08-15' , '2020-08-29' , '2020-09-13', '2020-09-27' , '2020-10-11' ,  '2020-11-18' , '2020-12-07',  '2021-02-14', '2021-07-11', '2021-07-27'] # 8.8까지지만 자료가 7.27이 끝이므로
+    georidoogi_gov_summa = ['2단계' ,    '2.5단계',       '2단계',        '1단계'       , '2단계'  ,     '2.5단계',    '2단계',       '2.5단계',       '1단계',       '1.5단계',    '2.5단계',    '2단계',    '4+단계']
+    georidoogi_start = pd.to_datetime(georidoogi_start , format = '%Y-%m-%d')
+    georidoogi_end = pd.to_datetime(georidoogi_end , format = '%Y-%m-%d')
+    rate_start , rate_end , temp_dangye = geori_index(georidoogi_start , georidoogi_end , pdata_sum , georidoogi_gov_summa)
+    temp_dangye = temp_dangye.dropna(axis=0)
+
+    print(rate_start)
+    print(rate_end)
+    print(temp_dangye)
+    print("-----------------------------------------------")    
+    #df[df['주소'].str.contains('서울')] 
+    rate_x = []
+    rate_y = []
+    print(temp_dangye.info())
+    for i in range(0, len(rate_start)):
+        rate_y.append( round(temp_dangye.loc[rate_start[i]:rate_end[i]]['승하차총승객수'].mean() , 2))
+        num = int((rate_start[i]+ rate_end[i]) / 2)
+        #rate_x.append( pdata_sum_x[num] )        
+        rate_x.append( georidoogi_start[i] + (georidoogi_end[i]-georidoogi_start[i]) / 2)
+    print("-----------------------------------------------2")    
+    for idx , i in enumerate(rate_x):
+        print(i , "  " ,  rate_y[idx])
+    plt.plot(rate_x ,rate_y , color='#086A87', marker='o')
+    
+    real_rate = [ round( (rate_y[i]-rate_y[i-1])/rate_y[i-1]*100 ,2) for i in range(1,len(rate_y)) ]
+    print(real_rate)
+    for x, y in enumerate(real_rate):
+        txt = "%d%%" %y
+        plt.text(rate_x[x+1], rate_y[x+1], txt, fontsize=18, color='k' , weight="bold" , 
+                        horizontalalignment='center', verticalalignment='bottom')
+
+    # 비율 구하려고 발악중--
     plt.legend(loc = 'upper left')  
     plt.title("서울 유동인구 , 신규확진자수 그래프 ",fontsize=15)
     plt.show()
-    #------------------------------------------------------------------------------------------------------------------------------------
+    #----------------------
 
 gu_corona()
