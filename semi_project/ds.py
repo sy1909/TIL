@@ -1,5 +1,6 @@
 #%%
 # -*- coding: utf-8 -*-
+from re import L
 import pandas as pd
 from statistics import mean
 import matplotlib.pyplot as plt # 막대그래프
@@ -8,6 +9,7 @@ import matplotlib.pyplot as plt # 막대그래프
 from matplotlib import rcParams
 import matplotlib
 from matplotlib import font_manager, rc
+from pandas.io.parsers import count_empty_vals
 matplotlib.font_manager._rebuild()
 import matplotlib.dates as mdates
 
@@ -322,13 +324,6 @@ def gu_corona():
     georidoogi_gov = [ '거리두기'  , '강화된거리두기' ,'일부 조치완화','생활거리두기', '3단계거리두기' , '3단계거리두기','4단계거리두기','4단계거리두기', '4단계거리두기','4단계거리두기','5단계거리두기','5단계거리두기','특별대책'   ,'특별대책' ,   '특별대책',   '추가조치',   '추가조치']
     georidoogi_gov_summa = ['2단계' ,    '2.5단계',       '2단계',        '1단계',      '1단계'       , '2단계'  ,     '2.5단계',    '2단계',       '2.5단계',       '1+단계',       '1.5단계',    '2.5단계',    '2.5+단계',    '2.5-단계',  '2.5--단계',    '2단계',    '4+단계']
     print( len(georidoogi_start) , len(georidoogi_end) , len(georidoogi_gov_summa))
-    # 날짜 비교 확인 부분
-    # print(type(pdata_all.columns))
-    # for i in pdata_all.columns:
-    #     print(i.month)
-    #     print(i.year , i.month , i.day)
-    #     if i.month == 2:
-    #         print(i.month)
     
     all_data = subway_all_file()
     pdata_sum = all_data.groupby(['사용일자'], as_index = False)["승하차총승객수"].sum()
@@ -456,7 +451,7 @@ def gu_subway():
     add_gu_data_top = add_gu_data.groupby(['자치구'], as_index = False)['승하차총승객수'].sum()
     add_gu_data_top = add_gu_data_top.sort_values(by= "승하차총승객수" , ascending=True)
     print(add_gu_data_top["자치구"])
-
+    #add_gu_data.to_csv('C:\\Users\\ksy\\downloads\\seoul_gu_data.csv' , header=False , index=False)
     # 시각화 부분-------------------------------------------------------------------------------------------------------
     # lineplot 써서 모든 그래프 출력 자치구별로 색깔 자동변함
     ax = sns.lineplot(x='사용일자', 
@@ -465,13 +460,116 @@ def gu_subway():
                      data=add_gu_data)
     plt.show()
 
-
+from IPython.display import display
+import geopandas as gpd
+import fiona
+from folium import Choropleth, Circle, Marker
 def last_subway_corona():
-    seoul_station_2020_map = folium.Map(location = [37.5502, 126.982],
-                                 zoom_start = 10.5,
-                                 tiles='cartodbpositron')
+    colnames=['SIG_KOR_NM', '사용일자', '승하차총승객수'] 
+    file_path = 'C:\\Users\\ksy\\downloads\\seoul_gu_data.csv'
+    pdata = pd.read_csv(file_path , encoding='cp949' , index_col=False , names=colnames)
+    pdata = pdata.groupby(['SIG_KOR_NM'] , as_index = False)['승하차총승객수'].sum()
+    print(pdata)
 
+    #37.496555, 127.064000 , 강남구
+    # 37.550230, 127.146991 , 강동구
+    # 37.642472, 127.012612 , 강북구
+    # 37.561297, 126.821522 , 강서구
 
+    #seoul_file = "C:\\Users\\ksy\\Downloads\\CTPRVN_202101\\TL_SCCO_CTPRVN.shp"
+    seoul_file = "C:\\Users\\ksy\\Downloads\\SIG_202101\\TL_SCCO_SIG.shp"
+    seoul = gpd.read_file(seoul_file , encoding = 'cp949')
+    seoul = seoul.drop("SIG_ENG_NM",axis=1)
+    pd.set_option('display.max_columns', None)
+    print(seoul[seoul['SIG_KOR_NM'].isin(pdata['SIG_KOR_NM'])] )
+    seoul = seoul[seoul['SIG_KOR_NM'].isin(pdata['SIG_KOR_NM'])]
+    seoul = seoul[seoul['SIG_CD'].str.slice(start=0 , stop=2) == "11" ]
+
+    #print(seoul)
+    #seoul.plot(color='black')
+    #좌표계 변경
+    print("--------------------------------------------")
+    print(seoul.crs)
+    seoul_crs = seoul.to_crs(epsg=4326)
+    print("과연 무엇이 나올까")
+    print(seoul_crs.crs)
+    print(seoul_crs.head())
+    seoul = pd.merge( seoul ,pdata, how='left', on='SIG_KOR_NM' )
+    print(seoul)
+    # seoul = seoul.to_crs(epsg='4326')
+    # seoul.plot(color='black')
+    # ax = seoul.plot(column="SIG_KOR_NM", figsize=(10,8), alpha=0.8)
+    # seoul.plot(ax = ax , column = '승하차총승객수', legend=True)
+    # #pdata.plot(ax=ax, marker='v', color='black', label='Firestation')
+    # ax.set_title("Seoul", fontsize=20)
+    # ax.set_axis_off()
+    # ax.legend(ax.lines, seoul['SIG_KOR_NM'] , loc='center left')
+    # plt.show()
+
+    seoul.geometry = seoul.buffer(0.001)
+    seoul = seoul.dissolve(by='SIG_CD')
+    ax = seoul.plot(figsize=(10, 8), column="SIG_KOR_NM", categorical=True,
+                    cmap="tab20b", edgecolor="k", legend=True, legend_kwds={'loc': 3})
+    seoul.plot(ax = ax, marker ='o'  , column = '승하차총승객수', legend=True)
+    ax.set_title("구 별로 묶은 서울의 기초 구역도")
+    ax.set_axis_off()
+    plt.show()
+    #plt.cla()
+
+    
+    seoul_gu = folium.Map(location = (37.5502, 126.982),
+                                 zoom_start = 10.5, tiles='cartodbpositron')
+    for _, r in seoul_crs.iterrows():
+        # Without simplifying the representation of each borough,
+        # the map might not be displayed
+        sim_geo = gpd.GeoSeries(r['geometry']).simplify(tolerance=0.001)
+        geo_j = sim_geo.to_json()
+        geo_j = folium.GeoJson(data=geo_j,
+                            style_function=lambda x: {'fillColor': 'orange'})
+        folium.Popup(r['SIG_KOR_NM']).add_to(geo_j)
+        geo_j.add_to(seoul_gu)
+                    
+    # Project to NAD83 projected crs
+    seoul = seoul.to_crs(epsg=2263)
+    # Access the centroid attribute of each polygon
+    seoul['centroid'] = seoul.centroid
+    # Project to WGS84 geographic crs
+
+    # geometry (active) column  좌표계변환
+    seoul = seoul.to_crs(epsg=4326)
+    # Centroid column  아마 저 popup 마커를 위해 중간좌표를 가져오는 코드일듯
+    seoul['centroid'] = seoul['centroid'].to_crs(epsg=4326)
+
+    print(seoul.head())
+    for _, r in seoul.iterrows():
+        lat = r['centroid'].y
+        lon = r['centroid'].x
+        folium.Marker(location=[lat, lon],
+                    popup='{}'.format(r['SIG_KOR_NM'])).add_to(seoul_gu)
+        folium.CircleMarker(location=[lat, lon], radius=r['승하차총승객수']/10000000,color='#3186cc',
+                        fill_color='#3186cc', popup='{}'.format(r['SIG_KOR_NM'])).add_to(seoul_gu)
+    display(seoul_gu)
+
+# map_osm = folium.Map(location=[37.566345, 126.977893], zoom_start=17)
+# folium.Marker([37.566345, 126.977893], popup='서울특별시청', icon=folium.Icon(color='red',icon='info-sign')).add_to(map_osm)
+# folium.CircleMarker([37.5658859, 126.9754788], radius=100,color='#3186cc',fill_color='#3186cc', popup='덕수궁').add_to(map_osm)
+# map_osm.save('d:/temp/chicken_data/map6.html')
+    # folium.Choropleth(geo_data = seoul,
+    #             data = seoul['승하차총승객수'],
+    #             columns = ['SIG_KOR_NM','승하차총승객수'],
+    #             fill_color="OrRd",legend_name='자치구 승하차총승객수').add_to(seoul_gu) 
+    # print("---------------33")
+    # print(seoul_gu)
+    # seoul_gu
+
+    # converted_json = seoul.to_json()
+    # map = folium.Map(location=[37.5502, 126.982], zoom_start=11, tiles='Stamen Toner')
+
+    # folium.GeoJson(
+    #     converted_json,
+    # ).add_to(map)
+
+    # map
     # 자치구 별로 4개씩 묶어서 출력
     # cnt = 0
     # tit = ""
@@ -503,7 +601,7 @@ def last_subway_corona():
 #subway_all_file()   # 전체 서울승하차 파일 합치기
 #gu_corona()         # 자치구별 확진자 발생동향 시각화 나중에 자치구별 합쳐서 전체로 사용
 #gu_gu()             # 자치구별로 서울승하차인원 파일 분류
-gu_subway()          # 최종 자치구별 서울승하차인원 분류 후 시각화까지
- 
+#gu_subway()          # 최종 자치구별 서울승하차인원 분류 후 시각화까지
+last_subway_corona()
 
 # %%
