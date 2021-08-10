@@ -157,13 +157,16 @@ def gu_corona():
     print("pdata_sum_x 의 개수는 " , len(pdata_sum_x))
     
     #clr_list = ['aqua','deepskyblue','peru','orangered','crimson']
+#    clr_list = ['#F5DCA8','#F1CB7E','#ECBB53','#DE9E17','#AC7A12']
     clr_list = ['#74D7EE','#358791','#699B37','#E9AE2B','#C75252']
     dangye = ['1단계','1.5단계','2단계','2.5단계','4단계']
     dan = ['1단','1.5','2단','2.5','4']
+    #test
+
 
     # 범례를 쓰기위한 구간
-    plt.plot(pdata_sum_x , pdata_sum['총신규확진자수'].to_list() , color='black' , 
-                        linewidth=2.0 , label = 'corona')
+    #plt.plot(pdata_sum_x , pdata_sum['총신규확진자수'].to_list() , color='black' , 
+    #                    linewidth=2.0 , label = 'corona')
     # 범례를 쓰기위한 구간
     for idx , i in enumerate(clr_list):
         plt.fill_between(pdata_sum_x[0:0] , pdata_sum_y[0:0], facecolor=i , alpha=1 , label=dangye[idx])
@@ -175,8 +178,8 @@ def gu_corona():
                             pdata_sum_y[temp_start[i]:temp_end[i]],color = clr_list[idx] , alpha=1) 
     plt.legend(loc = 'upper left')  
     plt.title("서울 유동인구 , 신규확진자수 그래프 ",fontsize=15)
-    plt.show()
-    plt.cla()
+    #plt.show()
+    #plt.cla()
     # 1, 1.5, 2, 2.5 4단계
     georidoogi_start =  ['2020-02-29' , '2020-03-22' , '2020-04-20' , '2020-05-06'  , '2020-08-16', '2020-08-30' , '2020-09-14' , '2020-09-28' ,  '2020-10-12' , '2020-11-19', '2020-12-08', '2021-02-15', '2021-07-12']
     georidoogi_end =    ['2020-03-21' , '2020-04-19' , '2020-05-05' , '2020-08-15' , '2020-08-29' , '2020-09-13', '2020-09-27' , '2020-10-11' ,  '2020-11-18' , '2020-12-07',  '2021-02-14', '2021-07-11', '2021-07-27'] # 8.8까지지만 자료가 7.27이 끝이므로
@@ -206,6 +209,7 @@ def gu_corona():
 
     plt.legend(loc = 'upper left')  
     plt.title("서울 유동인구,신규확진자수,거리두기 단계별 증감율" ,fontsize=15)
+
     plt.show()
     #----------------------
 
@@ -305,6 +309,17 @@ def gu_rate_map():
 gu_corona()
 #gu_rate_map()
 
+def temp():
+    file_path = 'C:\\Users\\ksy\\downloads\\total_corona.csv'
+    pdata = pd.read_csv(file_path , encoding='cp949' , index_col=False )
+    pdata = pdata[['기준일' , '신규사망자']]
+    pdata['기준일'] = pd.to_datetime(pdata['기준일'] , format = '%Y%m%d' )
+    print(pdata)
+    plt.plot(pdata['기준일'].to_list() , pdata['신규사망자'].to_list() , color='black' , 
+                        linewidth=2.0 , label = '신규사망자수')
+    plt.show()
+
+#temp()
 
 # %%
 
