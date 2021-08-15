@@ -443,7 +443,7 @@ def gu_subway():
     print(add_gu_data[['사용일자','승하차총승객수','자치구']])
     #['사용일자'] = add_gu_data['사용일자'].values.astype(float) test
  
-    # 그룹별 집계하는 방법 - 일자별 집계
+    # 그룹별 집계하는 방법 - 일자별 집계git
     add_gu_data = add_gu_data.groupby(['자치구','사용일자'], as_index = False)['승하차총승객수'].sum()
     print(add_gu_data.head())
     #add_gu_data.to_csv('C:\\Users\\ksy\\downloads\\seoul_gu_group.csv' , header=False , index=False)
