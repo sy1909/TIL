@@ -1,3 +1,11 @@
+#코딩테스트 연습 > 2021 KAKAO > 신규 아이디 추천 --------------------------------------------------------------------
+'''
+유저들의 아이디 생성
+카카오 아이디 규칙에 맞지 않는 아이디 입력 -> 입력된 아이디와 유사하면서 규칙에 맞는 아이디 추천
+길이 3 15 <=
+소문자 숫자 - _ . 사용가능
+. 는 처음과 끝에 사용X 연속X
+'''
 import re # 정규표현식 라이브러리
 def solution(new_id):
     answer = ''
@@ -25,13 +33,7 @@ def solution(new_id):
     #print(new_id)
     answer = new_id
     return answer
-'''
-유저들의 아이디 생성
-카카오 아이디 규칙에 맞지 않는 아이디 입력 -> 입력된 아이디와 유사하면서 규칙에 맞는 아이디 추천
-길이 3 15 <=
-소문자 숫자 - _ . 사용가능
-. 는 처음과 끝에 사용X 연속X
-'''
+
 '''
 # https://doorbw.tistory.com/127 정규표현식 관련
 import re
@@ -47,12 +49,60 @@ def solution(new_id):
     return st
 '''
 
+#코딩테스트 연습 > 2021 KAKAO > 메뉴 리뉴얼 ------------------------------------------------------------------
+'''
+메뉴 새로 구성
+단품으로만 제공 메뉴 코스요리 형태 재구성 새로운 메뉴 제공
+어떤 단품메뉴 조합 코스요리 메뉴 구성
+가장 많이 함께 주문한 단품메뉴들 코스 요리로 구성
+2가지 이상 최소 2명이상의 손님으로부터 주문된 단품 메뉴 코스후보포함
+'''
+from collections import Counter
+from itertools import combinations
+from itertools import permutations
+def solution(orders, course):
+    #print(orders , course , len(orders) , len(course))
+    #print(Counter(orders))
+    answer = []
+    for num in course:
+        courses = []
+        #print('num 이 돌아가는중 = ' , num)
+        for ord , orde in enumerate(orders):        
+            courses += [ ''.join(i) for i in list(combinations(sorted(orders[ord]), num)) ]
+            # 먼저 구성 메뉴들의 순서들을 정렬하고 그 조합을 구한다음 한 단어로 만들어서 값과 함께 담는다
+            # sorted(orders[ord]) 부분이 들어가야 밑에서 다시 고생하지 않아도 된다.
+        #print(Counter(courses))    
+        answer.append(Counter(courses))
+    
+    temp = []
+    for j in answer:
+        print(j) # 카운터 정렬 wx xw 가 같은 경우가 발생
+        # j1 = sorted(list(j.keys()))
+        # temp1 = []
+        # for j12 in j1:
+        #     if j12[::-1] in j1:
+        #         if j12[::-1] in temp1:
+        #             break
+        #         temp1.append(j12)
+        #         print("같은 문자열 " , j12)
+        #         j[j12] +=1
+        #         break
+        for i in j.keys(): # 카운터 키워드들의 키값들만 가져온다.
+            #print(i)
+            if  j: # 가장 많이 팔리고 2번이상 주문된 경우만 추려서 담는다.
+                if j[i] == max(j.values()) and max(j.values())>=2:
+                    print(j[i] , i)
+                    temp.append(i)
+                #a =  list(answer[i].values())
+                #print(max(a))
+                 #i.most_common(max(i.values()))
+    answer = sorted(temp)
+    print(answer)
+    return answer
 
 
 
-
-
-#순위검색
+# 코딩테스트 연습 > 2021 KAKAO > 순위검색 --------------------------------------------------------------------
 # 시간초과 코드
 def solution(info, query):
     answer = []
@@ -73,12 +123,57 @@ def solution(info, query):
                 cnt +=1
         answer.append(cnt)
     return answer
+#------------------------------------------------------------------------------------------------
+# 다른 해결 코드 / 먼저 나올 수 있는 모든 경우의 수 의 info를 구하고 queries 를 그에 맞춰서 판별
+from itertools import combinations
+from bisect import bisect_left
+def make_all_cases(temp):
+    cases = []
+    for k in range(5): # 0 1 2 3 4 는 bar가 몇개인지 경우의 수
+        for li in combinations([0, 1, 2, 3], k): # 여기서 k 는 bar 의 여부 0개 1개 2개 3개 4개 일 경우의 수
+            case = '' 
+            for idx in range(4): # java backend 등의 요소들 4개 접근 index인 idx 
+                if idx not in li:
+                    case += temp[idx] # li 에 없다는 뜻은 bar가 있는 경우의 수에 포함이 안되므로 값 그대로
+                else:
+                    case += '-' # li에 있다는 뜻은 bar가 들어가야 하는 경우의 수에 포함되므로 
+            cases.append(case)
+    return cases
+
+def solution(info, query):
+    answer = []
+    all_people = {}
+    for i in info: # 
+        seperate_info = i.split() # ["java backend junior pizza 150"] -> seperate_info 
+        cases = make_all_cases(i.split()) # seperate_info 랑 같은걸 넘겨서 모든 경우의 수를 리턴받고
+        for case in cases: # 리턴받은 - 가 들어가 모든 경우의 수들을 반복문 돌려서
+            if case not in all_people.keys(): all_people[case] = [int(seperate_info[4])] # case가 all_people 의 키에 없다면 키로 넣고 값을 점수로
+            else: all_people[case].append(int(seperate_info[4])) # 이미 있다면 해당키에 값을 추가
+
+    for key in all_people.keys(): # 모든 키에 대해 반복문 돌리고
+        all_people[key].sort() # 해당 키 내부의 값들을 정렬하고
+
+    for q in query: # 쿼리문 반복돌리기
+        seperate_q = q.split() # seperate_q -> ["java and backend and junior and pizza 100"]
+        target = seperate_q[0] + seperate_q[2] + seperate_q[4] + seperate_q[6] # and를 split 하지 않고 그냥 건너 뛰면서 값만 가져오기
+        if target in all_people.keys(): # target 문자열들이 키값에 존재하는지 판단 존재한다면 카운트 증가식으로 풀어도 될 듯
+            answer.append(len(all_people[target]) - bisect_left( all_people[target], int(seperate_q[7]), lo=0, hi=len(all_people[target])))
+        else:
+            answer.append(0)
+    return answer
 
 
+#코딩테스트 연습 > 2021 KAKAO > 합승 택시 요금 > 플로이드 워셜 or 다익스트라 -> 공부 ------------------------------
 
+'''
+택시비를 아낄 수 있는 방법 고민
+무지 와 비슷한 방향인 어피치
+6개 지점 사이의 이동 가능한 택시노선 예상요금
+출발지점은 S로 표시된 4번 지점
+A B 두사람은 4번지점에서 출발하여두사람 모두 귀가하는데 소요되는 예상 최저 택시요금
 
-
-#합승 택시 요금 > 플로이드 워셜 or 다익스트라 -> 공부
+그래프에서 최단 거리를 구할 수 있는 알고리즘에는 대표적으로 다익스트라와 플로이드 와샬
+'''
 def solution(n, s, a, b, fares):
     # 갈 수 없는 곳은 요금이 무한이라
     INF = int(1e9)
@@ -113,18 +208,100 @@ def solution(n, s, a, b, fares):
         answer = min(answer, temp)
     return answer
 
-'''
-택시비를 아낄 수 있는 방법 고민
-무지 와 비슷한 방향인 어피치
-6개 지점 사이의 이동 가능한 택시노선 예상요금
-출발지점은 S로 표시된 4번 지점
-A B 두사람은 4번지점에서 출발하여두사람 모두 귀가하는데 소요되는 예상 최저 택시요금
 
-그래프에서 최단 거리를 구할 수 있는 알고리즘에는 대표적으로 다익스트라와 플로이드 와샬
-'''
+#코딩테스트 연습 > 2021 KAKAO > 광고삽입 ------------------------------------------------------------
+def solution(play_time, adv_time, logs):
+    answer = ''
+    print(play_time)
+    print(adv_time)
+    time_sub = [] ; time_start = [] ; time_end = []
+    #전처리 시간들을 정수로 재생시간 가져오기
+    for log in logs:
+        temps = log.split('-')
+        temp_2 = [] ; 
+        for temp in temps:
+            time = temp.split(':')
+            temp_2.append(int(time[0])*3600 + int(time[1]) *60 + int(time[2]))
+        time_start.append(temp_2[0]) ; time_end.append(temp_2[1])  
+        time_sub.append(temp_2[1] - temp_2[0])
+    print(time_sub)
+    print(time_start)
+    print(time_end)
+    cnt = 0 #len(logs) 는 cnt의 최대 수
+    print(min(time_start) , max(time_end))
+    all_time = [] #; lala = []
+    for time in range(0 ,max(time_end)):
+        if time in time_start:
+            cnt += 1
+            #lala.append((cnt,time))
+        if time in time_end:
+            cnt -= 1
+            #lala.append((cnt,time))
+        all_time.append(cnt)
+    print(len(all_time))
+    print(all_time[min(time_start)])
+
+    for i in range(1, len(all_time)):          # 초당 시청자 수
+        all_time[i] += all_time[i-1]
+
+    print(max(all_time)[0],max(all_time)[1])   
+    
+#     largest_view = clock[ad-1]              # 00:00:00 ~ ad 까지의 시청자 수
+#     time_large_view = 0
+#     for end_minus1 in range(ad, pl):
+#         if largest_view < clock[end_minus1]-clock[end_minus1-ad]:
+#             largest_view = clock[end_minus1]-clock[end_minus1-ad]
+#             time_large_view = end_minus1+1 - ad
+#     return num_to_time(time_large_view)    
+    
+    adv = adv_time.split(':')
+    adv_t = int(adv[0])*3600 + int(adv[1]) *60 + int(adv[2])
+    print(adv_t)
+    
+    
+    return answer
+
+# 정상 다른사람 코드
+def solution(play_time, adv_time, logs):    
+    timeblock_logs = []
+    pl = time_to_num(play_time)
+    ad = time_to_num(adv_time)
+    clock = [0 for _ in range(pl+1)]
+
+    for i, log in enumerate(logs):
+        start = time_to_num(log[:8])
+        end = time_to_num(log[9:])
+        clock[start] += 1
+        clock[end] -= 1
+
+    for i in range(1, len(clock)):          # 초당 시청자 수
+        clock[i] += clock[i-1]
+
+    for i in range(1, len(clock)):          # 초단위 누적 시청자 수
+        clock[i] += clock[i-1]
+
+    largest_view = clock[ad-1]              # 00:00:00 ~ ad 까지의 시청자 수
+    time_large_view = 0
+    for end_minus1 in range(ad, pl):
+        if largest_view < clock[end_minus1]-clock[end_minus1-ad]:
+            largest_view = clock[end_minus1]-clock[end_minus1-ad]
+            time_large_view = end_minus1+1 - ad
+    return num_to_time(time_large_view)
+
+def time_to_num(hhmmss):
+    hours, minutes, seconds = hhmmss.split(':')
+    return 3600*int(hours) + 60*int(minutes)+int(seconds)
+
+def num_to_time(num):
+    hours = "0"+str(num//3600)
+    minutes = "0"+str((num%3600) // 60)
+    seconds = "0"+str((num%3600)%60)
+    return ":".join([hours[-2:],minutes[-2:],seconds[-2:]])
 
 
-# 카드 짝 맞추기
+
+
+# 카드 짝 맞추기  ------------------------------------------------------------------------------------------------------------
 from itertools import permutations # 중복을 허용한 조합
 from collections import deque # 양쪽 끝에서 삽입과 삭제가 모두 가능한 자료구조 큐와 스택을 합친것
 
@@ -274,12 +451,4 @@ def solution(board, r, c):
 유저 2장 선택 같은 캐릭터그림 화면에서 사라지고
 다른 그림 이면 다시 뒤집기
 모두 사라지면  종료
-
-옆으로이동하는 함수구현 1
-제거하는 함수 2
-리스토어 함수 3
-
-
-
-
 '''
